@@ -1,0 +1,266 @@
+@import "./form-tracks.css";
+.ag-history {
+  /* Inline-size containment has no intrinsic flex width; use the actual host allocation. */
+  inline-size: 100%;
+  box-sizing: border-box;
+  container-type: inline-size;
+  container-name: ag-history;
+  color: var(--ag-text);
+  background: var(--ag-surface);
+  font: var(--ag-text-size, 14px)/1.5 var(--ag-font, sans-serif);
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius-panel, 12px);
+  overflow: hidden;
+  min-width: 0;
+  text-align: start;
+}
+.ag-history * {
+  box-sizing: border-box;
+}
+.ag-history__title {
+  font-size: 1.2em;
+  margin: 0;
+  padding: 20px 20px 0;
+}
+.ag-history__toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 16px;
+  row-gap: 8px;
+  --ag-form-track-gap: 8px;
+  padding: 16px 20px;
+}
+.ag-history__toolbar[data-history-filter="true"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.ag-history__toolbar > [data-ag-form-field] {
+  min-inline-size: 0;
+  font-weight: 500;
+}
+.ag-history__toolbar :is(input, select) {
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  block-size: max(var(--ag-control-height, 36px), calc(1.5em + 18px));
+  background-color: var(--ag-surface-alt);
+  color: var(--ag-text);
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius-control, 7px);
+  font: inherit;
+  line-height: 1.5;
+  padding: 8px 12px;
+}
+.ag-history__search {
+  display: grid;
+  gap: 8px;
+}
+.ag-history__toolbar > [data-ag-form-field] > .ag-form-track__label {
+  font-weight: 500;
+}
+@container ag-history (max-width: 32rem) {
+  .ag-history__toolbar[data-history-filter="true"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@supports not (grid-template-rows: subgrid) {
+  .ag-history__toolbar[data-history-filter="true"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.ag-history__legend {
+  color: var(--ag-muted);
+  font-size: 0.86em;
+  margin: 0;
+  padding: 0 20px 16px;
+}
+.ag-history__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(210px, 28%);
+  border-block-start: 1px solid var(--ag-border);
+}
+.ag-history__scroll {
+  overflow: auto;
+  max-height: 640px;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.ag-history__graph {
+  position: relative;
+  min-width: 300px;
+}
+.ag-history__svg {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+.ag-history__edge {
+  fill: none;
+  stroke: var(--ag-history-lane, var(--ag-accent));
+  stroke-width: 2;
+  opacity: 0.75;
+}
+.ag-history__edge--dashed {
+  stroke-dasharray: 4 4;
+}
+.ag-history__svg circle {
+  fill: var(--ag-surface);
+  stroke: var(--ag-history-lane, var(--ag-accent));
+  stroke-width: 2.5;
+}
+.ag-history__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ag-history__row {
+  display: block;
+  width: 100%;
+  min-height: 90px;
+  border: 0;
+  border-block-end: 1px solid
+    color-mix(in srgb, var(--ag-border) 40%, transparent);
+  border-radius: 0;
+  padding-block: 16px;
+  padding-inline: var(--ag-history-gutter, 82px) 16px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.ag-history__row:hover {
+  background: var(--ag-surface-alt);
+}
+.ag-history__row[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--ag-accent) 10%, var(--ag-surface));
+  box-shadow: inset -3px 0 var(--ag-accent);
+}
+.ag-history__row:focus-visible,
+.ag-history__search input:focus-visible,
+.ag-history__action:focus-visible {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: -3px;
+}
+.ag-history__copy {
+  display: grid;
+  gap: 5px;
+  overflow-wrap: anywhere;
+}
+.ag-history__copy strong {
+  font-weight: 600;
+}
+.ag-history__refs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.ag-history__refs:empty {
+  display: none;
+}
+.ag-history__refs span {
+  font-size: 0.79em;
+  padding: 1px 7px;
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius-control, 7px);
+  color: var(--ag-accent);
+  font-family: var(--ag-mono, monospace);
+}
+.ag-history__meta,
+.ag-history__boundary {
+  font-size: 0.85em;
+  color: var(--ag-muted);
+}
+.ag-history__details {
+  padding: 22px;
+  border-inline-start: 1px solid var(--ag-border);
+  background: var(--ag-surface-alt);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.ag-history__details h4 {
+  font-size: 1.2em;
+  line-height: 1.4;
+  margin: 12px 0;
+}
+.ag-history__details code {
+  font: 0.9em var(--ag-mono, monospace);
+  color: var(--ag-accent);
+}
+.ag-history__eyebrow {
+  font-size: 0.75em;
+  letter-spacing: 0.12em;
+  color: var(--ag-muted);
+  margin: 0;
+}
+.ag-history__relations {
+  padding-inline-start: 18px;
+  font-size: 0.86em;
+  display: grid;
+  gap: 8px;
+}
+.ag-history__action {
+  font: inherit;
+  color: var(--ag-on-accent);
+  background: var(--ag-accent);
+  border: 1px solid var(--ag-accent);
+  border-radius: var(--ag-radius-control, 7px);
+  padding: 10px 12px;
+  min-height: 44px;
+  cursor: pointer;
+  text-align: start;
+}
+.ag-history__count {
+  padding: 12px 20px;
+  margin: 0;
+  border-block-start: 1px solid var(--ag-border);
+  color: var(--ag-muted);
+  font-size: 0.86em;
+}
+.ag-history__empty {
+  padding: 28px 20px;
+  color: var(--ag-muted);
+}
+@media (max-width: 760px) {
+  .ag-history__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ag-history__details {
+    border-inline-start: 0;
+    border-block-start: 1px solid var(--ag-border);
+  }
+  .ag-history__scroll {
+    max-height: 470px;
+  }
+}
+@media (forced-colors: active) {
+  .ag-history__edge,
+  .ag-history__svg circle {
+    stroke: CanvasText;
+  }
+  .ag-history__row[aria-pressed="true"] {
+    outline: 2px solid Highlight;
+  }
+}
+
+.ag-history[dir="rtl"] .ag-history__svg {
+  transform: scaleX(-1);
+}
+
+/* Author display rules must not reveal filters or details hidden by the controller. */
+.ag-history [hidden] {
+  display: none !important;
+}
+
+/* A narrow embedded history needs the same reading flow as a narrow browser. */
+@container ag-history (max-width: 48rem) {
+  .ag-history__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ag-history__details {
+    border-inline-start: 0;
+    border-block-start: 1px solid var(--ag-border);
+  }
+}

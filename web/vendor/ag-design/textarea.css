@@ -1,0 +1,40 @@
+/* Base field :is() includes input attribute selectors. Match its specificity explicitly
+   so the imported multiline rules keep their padding/states without changing legacy fields. */
+.ag-textarea {
+  max-inline-size: 100%;
+}
+.ag-field.ag-textarea > textarea.ag-textarea__control[data-resize] {
+  display: block;
+  max-inline-size: 100%;
+  line-height: 1.5;
+  padding: 8px 10px;
+  resize: vertical;
+}
+.ag-field.ag-textarea > textarea.ag-textarea__control[data-resize="none"] {
+  resize: none;
+}
+.ag-textarea__control::placeholder {
+  color: var(--ag-muted);
+  opacity: 1;
+}
+.ag-field.ag-textarea > textarea.ag-textarea__control:read-only {
+  background: var(--ag-surface-alt);
+}
+.ag-field.ag-textarea > textarea.ag-textarea__control:disabled {
+  background: var(--ag-surface-alt);
+  color: var(--ag-muted);
+  cursor: not-allowed;
+  opacity: 1;
+}
+.ag-field.ag-textarea > textarea.ag-textarea__control[aria-invalid="true"] {
+  border-color: var(--ag-danger);
+}
+@media (forced-colors: active) {
+  .ag-field.ag-textarea > textarea.ag-textarea__control[data-resize] {
+    border-color: CanvasText;
+  }
+  .ag-field.ag-textarea > textarea.ag-textarea__control:disabled {
+    color: GrayText;
+    border-color: GrayText;
+  }
+}

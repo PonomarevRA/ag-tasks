@@ -1,0 +1,6 @@
+ag-tasks includes AG Design files from the MIT-licensed public source:
+https://github.com/PonomarevRA/ag-design/tree/83254844d022bb6660911a8d72a0cad1dcbf42b8
+
+The shared desktop support in desktop_support/ matches that revision. The
+component and chart manifests under web/vendor/ identify the pinned assets.
+Their original MIT and third-party notices accompany the source files.

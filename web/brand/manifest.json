@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "ag-design/brand-consumer-v1",
+  "version": "1.0.0",
+  "appId": "ag-tasks",
+  "files": {
+    "app-icon.svg": "c6a0c2366454457f25b6c9819982c2c08b07874def39a8bb2773706a9da94a81",
+    "mark.svg": "af2ba12fc93c8826d7b5d0975e646492a06a7e13f66c244743bf0e8e67e8db72",
+    "mark.png": "bc8efb0a7967a7c5d034de190addae703493ba54ebcca2561d3243ae74b0463a",
+    "app.png": "7d3e0946da164186fe0324464ce5f3bad8027efc588577aca2353503edfafaff",
+    "app.ico": "df4010401d3312d5b011d418555b2d94a6f4635a5c7c203ca888fb8dbdd5f35f"
+  },
+  "scope": "source assets, not proof of an installed application update"
+}

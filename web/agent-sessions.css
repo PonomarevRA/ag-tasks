@@ -1,0 +1,51 @@
+/* Session data belongs to the service; this composition reuses the host's semantic palette and controls. */
+.view-filters[hidden],.history-toggle[hidden]{display:none!important}
+.agent-sessions>[hidden]{display:none!important}
+.session-sections,.service-facts,.agent-queue-container{grid-column:1/-1}
+.session-order-controls{grid-column:1/-1;display:flex;align-items:end;gap:16px;flex-wrap:wrap;min-width:0}
+.session-order-controls>label{display:grid;gap:6px;flex:0 1 300px;min-width:0;max-width:100%}
+.session-order-controls>p{flex:1 1 240px;margin:0}
+.observed-session-rows{display:grid;gap:10px;min-width:0}
+.session-sections{display:flex;gap:10px;flex-wrap:wrap}
+.service-facts{display:grid;gap:12px;min-width:0}
+.agent-sessions{display:grid;grid-template-columns:minmax(180px,280px) minmax(0,1fr);gap:20px;align-items:start}
+.agent-session-list{display:grid;gap:10px;align-content:start;min-width:0}
+.agent-session-detail{min-width:0;border-left:1px solid var(--line);padding-left:20px}
+.session-select{width:100%;text-align:left;white-space:normal;overflow-wrap:anywhere}
+.session-link-form{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin:16px 0}
+.session-link-form label{flex:1;min-width:140px}
+.session-events{display:grid;gap:12px}
+.session-event{border:1px solid var(--line);border-radius:8px;padding:12px;min-width:0}
+.session-event pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto}
+.session-event h3,.session-event p{overflow-wrap:anywhere}
+@media(max-width:760px){.agent-sessions{grid-template-columns:minmax(0,1fr)}.agent-session-detail{border-left:0;border-top:1px solid var(--line);padding:16px 0 0}}
+.agent-queue{display:grid;grid-template-columns:minmax(180px,280px) minmax(0,1fr);gap:20px;align-items:start}
+.queue-list,.queue-detail,.queue-pending{display:grid;gap:12px;min-width:0;align-content:start}
+.queue-list>details,.queue-detail>details{min-width:0}
+.queue-form{display:grid;gap:12px;margin:16px 0;min-width:0}
+.queue-form label{display:grid;gap:6px;min-width:0}
+.queue-form input,.queue-form textarea{box-sizing:border-box;width:100%;min-width:0;font:inherit}
+.queue-form textarea{resize:vertical}
+.queue-form button{justify-self:start;white-space:normal}
+.queue-actions{display:flex;gap:8px;flex-wrap:wrap}
+.queue-actions button{white-space:normal}
+.queue-item,.queue-active{padding:12px;border:1px solid var(--line);border-radius:8px;min-width:0}
+.queue-item p,.queue-active p,.queue-detail p,.queue-list summary{white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0}
+.queue-feedback{grid-column:1/-1;overflow-wrap:anywhere}
+@media(max-width:760px){.agent-queue{grid-template-columns:minmax(0,1fr)}}
+
+/* Chat presence has its own source and cannot change the task-link form. */
+.codex-sessions{grid-column:1/-1;min-width:0}
+.codex-session-rows{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.codex-session-row{min-width:0;padding:12px;border:1px solid var(--line);border-radius:8px;overflow-wrap:anywhere}
+.codex-session-row h3{margin:0 0 8px;font-size:inherit}
+
+/* Local view selection stays quieter than an action; the inset underline marks the current view. */
+.session-sections {gap:4px;align-items:center;border-block-end:1px solid var(--ag-border);padding-block-end:4px}
+.session-sections button[aria-pressed="true"] {
+  background:var(--selected);
+  color:var(--ag-text);
+  box-shadow:inset 0 -2px var(--ag-accent);
+  font-weight:600;
+}
+.session-sections > p {margin:4px 0 4px 8px}

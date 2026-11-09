@@ -1,0 +1,206 @@
+.ag-settings-panel {
+  /* Inline containment has no intrinsic width; fill the allocated host content box. */
+  inline-size: 100%;
+  box-sizing: border-box;
+  container-type: inline-size;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-width: 0;
+  max-width: 100%;
+  max-height: min(80vh, 54rem);
+  color: var(--ag-text);
+  background: var(--ag-surface);
+  font: inherit;
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius, 12px);
+  overflow: hidden;
+}
+.ag-settings-panel__header,
+.ag-settings-panel__footer {
+  padding: 1rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.ag-settings-panel__header {
+  border-block-end: 1px solid var(--ag-border);
+}
+.ag-settings-panel__header h2 {
+  font: inherit;
+  font-weight: 650;
+  margin: 0;
+}
+.ag-settings-panel__header p {
+  color: var(--ag-muted);
+  margin: 0.35rem 0 0;
+  line-height: 1.5;
+}
+.ag-settings-panel__footer {
+  border-block-start: 1px solid var(--ag-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.ag-settings-panel__body {
+  display: grid !important;
+  gap: 0;
+  grid-template-columns: minmax(9rem, 13rem) minmax(0, 1fr);
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+.ag-settings-panel__body > [role="tablist"] {
+  padding: 0.65rem;
+  border-inline-end: 1px solid var(--ag-border);
+  min-width: 0;
+  overflow: auto;
+  align-self: stretch;
+}
+.ag-settings-panel__body [role="tab"] {
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  text-align: start;
+  min-width: 0;
+  min-height: 32px;
+}
+.ag-settings-panel__body > .ag-tabs__panels {
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+.ag-settings-panel__body .ag-tabs__panel {
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  padding: 1rem;
+}
+.ag-settings-panel__category {
+  display: grid;
+  gap: 1.5rem;
+  min-width: 0;
+}
+.ag-settings-panel__group {
+  display: grid;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.ag-settings-panel__group h3 {
+  margin: 0;
+  font: inherit;
+  font-weight: 650;
+}
+.ag-settings-panel__description {
+  margin: 0;
+  color: var(--ag-muted);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.ag-settings-panel__rows {
+  display: grid;
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius, 8px);
+  overflow: hidden;
+  min-width: 0;
+}
+.ag-settings-panel__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(9rem, 45%);
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  min-width: 0;
+}
+.ag-settings-panel__row + .ag-settings-panel__row {
+  border-block-start: 1px solid var(--ag-border);
+}
+.ag-settings-panel__label {
+  min-width: 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.ag-settings-panel__label > label,
+.ag-settings-panel__label > span {
+  font-weight: 550;
+}
+.ag-settings-panel__label p {
+  font-size: 0.9em;
+  color: var(--ag-muted);
+  margin: 0.25rem 0 0;
+}
+.ag-settings-panel__control {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  min-width: 0;
+  max-width: 100%;
+}
+.ag-settings-panel__control > input:not([type="checkbox"]):not([type="radio"]),
+.ag-settings-panel__control > select,
+.ag-settings-panel__control > textarea,
+.ag-settings-panel__control > .ag-select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  font: inherit;
+}
+.ag-settings-panel__control textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+.ag-settings-panel :focus-visible {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: 2px;
+}
+.ag-settings-panel [hidden] {
+  display: none !important;
+}
+@media (max-width: 680px) {
+  .ag-settings-panel__body.ag-tabs[data-orientation="vertical"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ag-settings-panel__body > [role="tablist"] {
+    max-height: 12rem;
+    border-inline-end: 0;
+    border-block-end: 1px solid var(--ag-border);
+  }
+  .ag-settings-panel__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+  .ag-settings-panel__control {
+    justify-content: flex-start;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ag-settings-panel * {
+    scroll-behavior: auto;
+  }
+}
+
+/* Match the tabs orientation specificity so a narrow panel really switches tracks. */
+@container (max-width:680px) {
+  .ag-settings-panel__body.ag-tabs[data-orientation="vertical"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ag-settings-panel__body > .ag-tabs__list {
+    flex-direction: column;
+    max-height: 12rem;
+    border-inline-end: 0;
+    border-block-end: 1px solid var(--ag-border);
+  }
+  .ag-settings-panel__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+  .ag-settings-panel__control {
+    justify-content: flex-start;
+  }
+}
+
+.ag-settings-panel__control > input:not([type="checkbox"]):not([type="radio"]),
+.ag-settings-panel__control > select,
+.ag-settings-panel__control > button {
+  min-height: var(--ag-control-height, 32px);
+}

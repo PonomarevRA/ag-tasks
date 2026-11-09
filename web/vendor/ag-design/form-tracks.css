@@ -1,0 +1,45 @@
+/* Opt in to shared label/control/feedback tracks; the host keeps column widths and breakpoints. */
+@supports (grid-template-rows: subgrid) {
+  .ag-form-tracks:not([hidden]) {
+    display: grid;
+    row-gap: var(--ag-form-track-gap, 6px);
+    align-items: stretch;
+  }
+
+  .ag-form-tracks > [data-ag-form-field]:not([hidden]) {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    /* Child widget gaps must match the carrier; otherwise subgrid gaps shift controls by half the difference. */
+    row-gap: inherit;
+    min-inline-size: 0;
+  }
+
+  /* Stretch the label box across its shared track; its text ends above the common control line. */
+  .ag-form-tracks > [data-ag-form-field] > .ag-form-track__label:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    grid-row: 1;
+    align-self: stretch;
+    min-inline-size: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .ag-form-tracks > [data-ag-form-field] > .ag-form-track__control {
+    grid-row: 2;
+    align-self: end;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    margin-block: 0;
+  }
+
+  /* Help/error expansion changes this track and later rows, never the control's alignment anchor. */
+  .ag-form-tracks > [data-ag-form-field] > .ag-form-track__feedback {
+    grid-row: 3;
+    align-self: start;
+    min-inline-size: 0;
+    margin-block: 0;
+  }
+}

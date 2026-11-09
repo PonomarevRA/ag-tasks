@@ -1,0 +1,66 @@
+.ag-popover {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+}
+.ag-popover__trigger {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.ag-popover__panel {
+  box-sizing: border-box;
+  inset: auto;
+  margin: 0;
+  padding: 16px;
+  max-width: calc(100vw - 16px);
+  min-width: 0;
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius-panel, 10px);
+  background: var(--ag-surface);
+  color: var(--ag-text);
+  font-family: var(--ag-font, inherit);
+  font-size: var(--ag-text-size, 14px);
+  line-height: 1.5;
+  box-shadow: 0 8px 28px #0003;
+  overflow: auto;
+  scroll-padding-block: 64px 16px;
+  z-index: var(--ag-layer-popup, 100);
+  overflow-wrap: anywhere;
+}
+.ag-popover__header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--ag-surface);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-block-end: 16px;
+}
+.ag-popover__header > h2 {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.ag-popover__close {
+  flex: none;
+  min-width: 32px;
+  line-height: 1;
+}
+.ag-popover__content {
+  min-width: 0;
+  max-width: 100%;
+}
+.ag-popover__panel [hidden],
+.ag-popover__panel[hidden] {
+  display: none !important;
+}
+.ag-popover :is(button, [role="combobox"], input, select):focus-visible,
+.ag-popover__panel:focus-visible {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: 3px;
+}

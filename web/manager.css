@@ -1,0 +1,43 @@
+.manager-workspace,.manager-control,.manager-results {display:grid;gap:1rem;min-inline-size:0}
+.manager-modes,.manager-queues,.manager-pager {display:flex;flex-wrap:wrap;gap:.55rem}
+.manager-modes {padding-block-end:.75rem;border-bottom:1px solid var(--ag-border)}
+.manager-modes button,.manager-queues button {white-space:normal;text-align:start}
+.manager-modes button[aria-pressed="true"],.manager-queues button[aria-pressed="true"] {border-color:var(--ag-accent);background:color-mix(in srgb,var(--ag-accent) 16%,var(--ag-surface));color:var(--ag-text)}
+.manager-filters {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,10rem),1fr));gap:.8rem;--ag-form-track-gap:.5rem}
+.manager-filters label {margin:0;min-inline-size:0}
+.manager-filters input,.manager-filters select {max-inline-size:100%}
+.manager-kpis {grid-template-columns:repeat(auto-fit,minmax(min(100%,12rem),1fr));margin-block-start:1rem}
+.manager-kpis>div {display:grid;grid-template-rows:subgrid;grid-row:span 2}
+.manager-kpis dt .ag-inline-help {display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:.35rem}
+.manager-load-status:empty {display:none}
+.manager-report {min-inline-size:0}
+.manager-table-scroll {overflow:auto;max-inline-size:100%;max-block-size:min(62dvh,36rem);margin-block:1rem}
+.manager-table {width:100%;min-inline-size:68rem;border-collapse:collapse}
+.manager-table caption {text-align:start;padding-block:.75rem;color:var(--ag-muted)}
+.manager-table th,.manager-table td {text-align:start;vertical-align:top;padding:.7rem .55rem;border-bottom:1px solid var(--ag-border);font-weight:400}
+.manager-table thead th {font-weight:600;color:var(--ag-muted);white-space:nowrap;position:sticky;inset-block-start:0;background:var(--ag-surface);z-index:1}
+.manager-table th[scope="row"] {min-inline-size:17rem;max-inline-size:27rem}
+.manager-table th[scope="row"] button {white-space:normal;text-align:start;overflow-wrap:anywhere;max-inline-size:100%;scroll-margin-block:3rem}
+.manager-table small {display:block;color:var(--ag-muted);font-size:.9rem;margin-block-start:.35rem}
+.manager-table td {overflow-wrap:anywhere}
+.manager-status {display:inline-block;padding:.2rem .4rem;border:1px solid var(--ag-border);border-radius:.35rem;white-space:nowrap}
+.manager-reasons {margin:.4rem 0;font-weight:550;line-height:1.5}
+.manager-overdue {font-weight:650!important}
+.manager-overdue small {color:var(--ag-text)}
+.manager-pager {margin-block:.8rem}
+.manager-chart-grid {display:grid;grid-template-columns:minmax(0,1fr);gap:1rem;min-inline-size:0;align-items:start;container-type:inline-size}
+.manager-chart-grid>.dashboard-block {padding:1rem;border:1px solid var(--ag-border);border-radius:.7rem;min-inline-size:0}
+.manager-chart-grid .dashboard-block-info {inset-block-start:1rem;inset-inline-end:1rem}
+.manager-chart-keys {padding-inline-start:1.7rem;margin-block:1rem}
+.manager-chart-keys li {padding:.3rem 0;overflow-wrap:anywhere}
+.manager-chart-keys li strong {margin-inline-start:.75rem}
+.manager-plot {overflow:auto;min-inline-size:0;max-inline-size:100%;margin-block:1rem}
+.manager-exact {overflow:auto;margin-block-start:.75rem}
+.manager-exact table {width:100%;border-collapse:collapse;min-inline-size:28rem}
+.manager-exact td,.manager-exact th {padding:.45rem;text-align:start;border-bottom:1px solid var(--ag-border)}
+@media(min-width:1240px) {.manager-chart-grid {grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Native table columns retain their declared purpose minima inside the local 2D scroller. */
+.manager-table tr>:nth-child(2),.manager-table tr>:nth-child(5) {min-inline-size:8em}
+.manager-table tr>:nth-child(3),.manager-table tr>:nth-child(6),.manager-table tr>:nth-child(7) {min-inline-size:6em}
+.manager-table tr>:nth-child(4) {min-inline-size:4em}

@@ -1,0 +1,35 @@
+/* A4px host grid:12px edge +12px chevron +12px text gap. Native popup/keyboard behavior stays owned by select. */
+select.ag-select__control:not([multiple]):not([size]),
+select.ag-select-indicator:not([multiple]):not([size]),
+:where([data-ag-select-indicators]) select:not([multiple]):not([size]) {
+  appearance: none;
+  padding-inline-start: var(--ag-select-indicator-inset, 12px);
+  padding-inline-end: calc(var(--ag-select-indicator-inset, 12px) + 12px + var(--ag-select-indicator-gap, 12px));
+  background-image:
+    linear-gradient(45deg, transparent 42%, currentColor 42% 58%, transparent 58%),
+    linear-gradient(-45deg, transparent 42%, currentColor 42% 58%, transparent 58%);
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+  background-position:
+    right calc(var(--ag-select-indicator-inset, 12px) + 6px) center,
+    right var(--ag-select-indicator-inset, 12px) center;
+}
+
+/* Logical padding and mirrored icon positions preserve a distinct text slot in RTL. */
+select.ag-select__control:not([multiple]):not([size]):dir(rtl),
+select.ag-select-indicator:not([multiple]):not([size]):dir(rtl),
+:where([data-ag-select-indicators]) select:not([multiple]):not([size]):dir(rtl) {
+  background-position:
+    left var(--ag-select-indicator-inset, 12px) center,
+    left calc(var(--ag-select-indicator-inset, 12px) + 6px) center;
+}
+
+/* High-contrast renderers may suppress gradients; restore the system indicator rather than hide the affordance. */
+@media (forced-colors: active) {
+  select.ag-select__control:not([multiple]):not([size]),
+  select.ag-select-indicator:not([multiple]):not([size]),
+  :where([data-ag-select-indicators]) select:not([multiple]):not([size]) {
+    appearance: auto;
+    background-image: none;
+  }
+}

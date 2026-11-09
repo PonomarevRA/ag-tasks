@@ -1,0 +1,799 @@
+/* Operational columns and an 8px rhythm preserve the Tasks palette and actual task lifecycle. */
+:root {
+  --task-gap: 16px;
+  --muted: #555c68;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #eef0f5;
+    --muted: #d6dbe6;
+  }
+}
+.app-window {
+  max-width: none;
+  margin: 0;
+  min-height: 100dvh;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.workspace {
+  min-height: calc(100dvh - 56px);
+}
+main {
+  padding: 20px 24px;
+}
+.toolbar {
+  gap: 16px;
+  margin-block-end: 16px;
+}
+.toolbar h1 {
+  font-size: 24px;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+.toolbar-actions:empty {
+  display: none;
+}
+.space-breadcrumb {
+  font-size: 12px;
+  margin-block-end: 6px;
+}
+.task-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px 24px;
+  margin-block-end: 16px;
+  min-width: 0;
+}
+.view-filters {
+  flex: 1 1 480px;
+  grid-template-columns: minmax(180px, 1fr) minmax(160px, 220px);
+  gap: 16px;
+  max-width: 800px;
+  margin: 0;
+}
+.history-toggle {
+  min-height: 36px;
+  margin: 0;
+  padding-block: 8px;
+  font-size: 12px;
+}
+.coverage-notice {
+  margin-block: 0 12px;
+}
+.coverage-notice:empty {
+  display: none;
+}
+.task-filter-bar:has(.view-filters[hidden]):has(.history-toggle[hidden]) {
+  display: none;
+}
+.board {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  height: var(--task-work-area-height, max(280px, calc(100dvh - 240px)));
+  min-height: 280px;
+  max-width: 100%;
+  overflow: auto;
+  padding-block-end: 8px;
+  overscroll-behavior-inline: contain;
+}
+.column {
+  flex: 0 0 272px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  padding: 12px;
+  border-radius: 10px;
+  overflow: auto;
+  scroll-padding-block-start: 48px;
+}
+.column--empty {
+  flex-basis: 184px;
+}
+.column-heading {
+  position: sticky;
+  inset-block-start: -12px;
+  z-index: 2;
+  flex: none;
+  min-height: 36px;
+  margin: -12px -12px 0;
+  padding: 12px;
+  background: var(--subtle);
+  border-block-end: 1px solid var(--line);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.column > .card {
+  flex: none;
+  margin: 0;
+}
+:is(.card, .task-graph-card, .issue-row).ag-button {
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--panel);
+  box-shadow: none;
+  line-height: 1.45;
+}
+.card.ag-button,
+.task-graph-card.ag-button {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+.task-card-heading {
+  gap: 8px;
+  align-items: start;
+  font-size: 12px;
+}
+.task-card-heading .key {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+.task-card-heading .ag-status {
+  max-width: 100%;
+  white-space: normal;
+  font-size: 11px;
+}
+.card .task-card-title,
+.task-graph-card .task-card-title,
+.issue-row .task-card-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.task-card-state {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+}
+.task-card-state p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+[data-needs-attention="true"] .task-card-state {
+  color: var(--blue);
+}
+.task-card-state .coverage-notice {
+  margin: 0;
+  color: inherit;
+}
+.task-card-context {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+  width: 100%;
+  padding-block-start: 10px;
+  border-block-start: 1px solid var(--line);
+}
+.task-card-role {
+  font-size: 12px;
+  font-weight: 500;
+}
+.task-card-context .task-labels {
+  margin: 0;
+  gap: 4px 10px;
+}
+.task-card-context .task-labels .ag-status {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.task-card-facts {
+  font-size: 11px;
+  line-height: 1.5;
+}
+.issue-list {
+  gap: 12px;
+}
+.issue-row.ag-button {
+  display: grid;
+  grid-template-columns: minmax(100px, 152px) minmax(180px, 1fr) minmax(
+      160px,
+      240px
+    );
+  gap: 8px 24px;
+  align-items: start;
+}
+.issue-row > .task-card-heading {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  flex-direction: column;
+  justify-content: start;
+}
+.issue-row > .task-card-title {
+  grid-column: 2;
+  grid-row: 1;
+}
+.issue-row > .task-card-state {
+  grid-column: 2;
+  grid-row: 2;
+}
+.issue-row > .task-card-context {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  border: 0;
+  padding: 0;
+}
+.task-graph-viewport {
+  height: var(--task-work-area-height, max(280px, calc(100dvh - 260px)));
+  min-height: 280px;
+  max-height: none;
+}
+.graph-toolbar {
+  margin-block-end: 12px;
+}
+.task-graph-group {
+  padding: 20px;
+}
+.task-graph-level {
+  width: 260px;
+  gap: 16px;
+}
+.task-group-heading {
+  margin-block-end: 16px;
+  font-size: 13px;
+}
+/* Dialogs have a single scrolling body; native headers and explicit actions remain reachable. */
+#editor {
+  width: min(1120px, calc(100vw - 32px));
+}
+#detail {
+  width: min(1240px, calc(100vw - 32px));
+}
+dialog {
+  max-height: calc(100dvh - 32px);
+  border-radius: 12px;
+}
+dialog .dialog-heading {
+  padding: 20px 24px;
+  gap: 16px;
+}
+dialog .dialog-heading h2 {
+  font-size: 18px;
+  line-height: 1.4;
+}
+dialog .dialog-body {
+  padding: 24px;
+}
+dialog .dialog-actions {
+  padding: 16px 24px;
+}
+.issue-editor-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(260px, 1fr);
+  gap: 32px;
+  margin-block-end: 24px;
+}
+.issue-editor-layout h3 {
+  font-size: 14px;
+  margin-block: 0 16px;
+}
+.issue-editor-main,
+.issue-editor-context {
+  min-width: 0;
+}
+.issue-editor-main > label,
+.issue-editor-context label {
+  margin: 0 0 16px;
+}
+.issue-editor-main textarea {
+  min-height: 248px;
+  line-height: 1.6;
+}
+.issue-editor-context {
+  padding-inline-start: 24px;
+  border-inline-start: 1px solid var(--line);
+}
+.issue-editor-context .field-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+.editor-options {
+  padding-block: 16px;
+}
+.editor-options > summary {
+  min-height: 36px;
+  font-size: 13px;
+}
+.task-field {
+  min-width: 0;
+  margin: 0;
+  gap: 8px;
+}
+.task-field-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+}
+:is(
+    #issue-form,
+    #detail-body,
+    .review-routing-form,
+    .session-link-form,
+    .repo-form,
+    .queue-form,
+    #space-form
+  )
+  .ag-field
+  :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  min-height: 36px;
+  border-color: var(--muted);
+  padding: 8px 10px;
+  font-size: 13px;
+}
+:is(#issue-form, #detail-body) .ag-field textarea {
+  min-height: 88px;
+  line-height: 1.6;
+  resize: vertical;
+}
+#issue-form .issue-editor-main .ag-field textarea {
+  min-height: 248px;
+}
+.criterion-editor {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.criterion-editor legend {
+  max-width: 100%;
+  padding-inline: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.criterion-editor > label {
+  margin: 0;
+}
+.criterion-declaration {
+  min-height: 32px;
+  font-size: 12px;
+}
+.criterion-editor .criterion-remove {
+  margin: 0;
+}
+.task-detail-layout {
+  min-width: 0;
+}
+.task-detail-summary {
+  padding: 0 0 20px;
+  margin-block-end: 24px;
+  border-block-end: 1px solid var(--line);
+}
+.task-detail-identity {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-block-end: 12px;
+}
+.task-detail-role {
+  color: var(--muted);
+  font-size: 13px;
+}
+.task-detail-summary p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+.task-detail-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 288px;
+  align-items: start;
+  gap: 32px;
+}
+.task-detail-main {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+.task-detail-actions {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--subtle);
+  padding: 16px;
+}
+.task-detail-actions > h3 {
+  margin: 0 0 16px;
+  font-size: 14px;
+}
+.task-detail-actions .status-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  margin: 0 0 16px;
+}
+.task-detail-actions .status-bar select {
+  width: 100%;
+}
+.task-detail-actions .status-bar button {
+  width: 100%;
+}
+.task-detail-actions .status-bar .ag-button--primary {
+  margin-block-start: 8px;
+}
+.task-detail-actions .meta {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.task-detail-actions .task-facts {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  margin: 0;
+}
+.task-detail-actions .task-facts dd {
+  margin: 0 0 8px;
+}
+.task-detail-actions .task-detail-disclosure {
+  margin-block-start: 16px;
+}
+.task-detail-description > h3 {
+  margin-block: 0 16px;
+  font-size: 14px;
+}
+.task-detail-description .markdown-body {
+  margin: 0;
+  font-size: 14px;
+  max-width: 76ch;
+}
+.task-detail-description .markdown-body > :first-child {
+  margin-block-start: 0;
+}
+.task-detail-description .markdown-body h1 {
+  font-size: 1.6em;
+}
+.task-detail-disclosure {
+  margin-block-start: 20px;
+  border-block-start: 1px solid var(--line);
+  padding-block-start: 12px;
+  min-width: 0;
+}
+.task-detail-disclosure > summary {
+  min-height: 36px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.task-detail-slot {
+  min-width: 0;
+  padding-block-start: 12px;
+}
+.task-detail-slot > .section {
+  margin-block-start: 0;
+  border: 0;
+  padding-block-start: 0;
+}
+.task-detail-slot > .section > h3:first-child {
+  display: none;
+}
+.task-detail-slot .criteria-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+.task-detail-slot .criterion {
+  padding-block: 12px;
+}
+.task-detail-slot .criterion:first-of-type {
+  padding-block-start: 0;
+}
+.task-detail-slot .inline-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+.task-detail-slot .inline-form label {
+  min-width: 0;
+}
+.task-detail-slot .inline-form button {
+  justify-self: start;
+}
+.task-detail-slot .cross-space-key {
+  max-width: none;
+}
+.task-detail-slot :is(.description, .history p) {
+  overflow-wrap: anywhere;
+}
+.detail-loading {
+  margin: 0;
+  padding-block: 24px;
+  color: var(--muted);
+}
+.task-detail-slot details > .task-field {
+  margin-block: 12px;
+}
+#detail-body .history + .task-field,
+#detail-body .task-field + button {
+  margin-block: 12px;
+}
+/* Review work is primary; routing defaults stay in a secondary, clearly labelled column. */
+body[data-task-view="reviews"] #content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  gap: 24px;
+  align-items: start;
+}
+.review-routing-form {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--subtle);
+  min-width: 0;
+}
+.review-routing-form > :is(h2, p, label) {
+  margin: 0;
+}
+.review-routing-form > h2 {
+  font-size: 16px;
+  line-height: 1.5;
+}
+.review-routing-form > button {
+  justify-self: start;
+  white-space: normal;
+}
+.review-issue-list {
+  grid-column: 1;
+  grid-row: 1;
+}
+.review-issue-list:empty {
+  display: none;
+}
+.review-inbox-row {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.review-inbox-row .issue-row {
+  display: flex;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.review-inbox-row > button:not(.issue-row) {
+  margin-block-start: 8px;
+}
+body[data-task-view="reviews"] #content > .ag-empty {
+  grid-column: 1;
+  grid-row: 1;
+}
+.session-sections {
+  border-block-end: 1px solid var(--line);
+  padding-block-end: 12px;
+  gap: 8px;
+}
+.agent-session-list,
+.queue-list {
+  padding: 16px;
+  background: var(--subtle);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.session-select {
+  padding: 12px;
+  min-height: 44px;
+}
+.agent-session-detail,
+.queue-detail {
+  min-width: 0;
+  padding: 0 0 0 24px;
+  border: 0;
+}
+.codex-session-row,
+.session-event,
+.queue-item,
+.queue-active {
+  padding: 16px;
+}
+.repo-form {
+  gap: 16px;
+  max-width: 900px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--subtle);
+}
+.repo-form label {
+  margin: 0;
+}
+:where(.task-detail-layout, #issue-form, .review-routing-form)
+  :is(summary, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+@media (max-width: 900px) {
+  .issue-row.ag-button {
+    grid-template-columns: minmax(88px, 120px) minmax(0, 1fr);
+    gap: 8px 16px;
+  }
+  .issue-row > .task-card-context {
+    grid-column: 2;
+    grid-row: 3;
+  }
+  .task-detail-columns {
+    grid-template-columns: minmax(0, 1fr) 252px;
+    gap: 24px;
+  }
+  .issue-editor-layout {
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 24px;
+  }
+}
+@media (max-width: 760px) {
+  main {
+    padding: 16px 12px;
+  }
+  .task-filter-bar {
+    gap: 8px;
+    margin-block-end: 12px;
+  }
+  .view-filters {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    flex-basis: 100%;
+  }
+  .board {
+    gap: 12px;
+  }
+  .column {
+    flex-basis: min(272px, calc(100vw - 88px));
+  }
+  .column--empty {
+    flex-basis: 176px;
+  }
+  .task-detail-columns,
+  .issue-editor-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .task-detail-actions {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .task-detail-main {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .task-detail-actions .status-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .task-detail-actions .status-bar > label {
+    grid-column: 1 / -1;
+  }
+  .task-detail-actions .status-bar .ag-button--primary {
+    margin: 0;
+  }
+  .issue-editor-context {
+    padding: 0;
+    border: 0;
+  }
+  .issue-editor-context .field-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  body[data-task-view="reviews"] #content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .review-routing-form {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .review-issue-list {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .agent-session-detail,
+  .queue-detail {
+    padding: 0;
+  }
+  #editor,
+  #detail {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+  dialog .dialog-heading,
+  dialog .dialog-body {
+    padding: 16px;
+  }
+  dialog .dialog-actions {
+    padding: 12px 16px;
+  }
+  .task-detail-slot .complexity-comparison {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .issue-row.ag-button {
+    display: flex;
+    gap: 10px;
+  }
+  .issue-row > .task-card-heading {
+    flex-direction: row;
+  }
+  .issue-row > .task-card-context {
+    border-block-start: 1px solid var(--line);
+    padding-block-start: 10px;
+  }
+  .issue-editor-context .field-grid,
+  .task-detail-actions .status-bar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (pointer: coarse) {
+  :is(.task-field, #issue-form .ag-field, .review-routing-form .ag-field)
+    :is(input:not([type="checkbox"]), select),
+  .dialog-actions button,
+  .task-detail-actions button {
+    min-height: 44px;
+  }
+}
+
+.detail-feedback {
+  flex: none;
+  margin: 0;
+  padding: 12px 24px 0;
+  color: var(--muted);
+}
+.detail-feedback:empty {
+  display: none;
+}
+.dialog-actions .ag-button,
+.task-detail-actions .ag-button {
+  min-height: 36px;
+}
+@media (min-width: 360px) and (max-width: 760px) {
+  .view-filters {
+    grid-template-columns: minmax(0, 1.4fr) minmax(110px, 1fr);
+    align-items: end;
+  }
+}
+
+/* A single, persistent recovery region stays outside aria-busy task results. */
+.view-feedback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-block-end: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--subtle);
+}
+.view-feedback p { flex: 1 1 240px; min-width: 0; margin: 0; overflow-wrap: anywhere; }
+.view-feedback .ag-button { min-height: 36px; white-space: normal; }
+#reset-filters { min-height: 36px; }
+@media (max-width: 760px) {
+  .view-filters { grid-template-columns: minmax(0, 1fr); }
+  .history-toggle { min-height: 36px; padding-block: 8px; }
+}
+.view-feedback[hidden] { display: none; }
+
+/* Keep the page heading semantic, with less visual weight when the native title is present. */
+.toolbar .space-breadcrumb {margin:4px 0 0}
+.native-shell.native-toolbar.native-identity.native-window-commands .toolbar h1 {
+  font-size:1.25rem;
+  letter-spacing:normal;
+}

@@ -1,0 +1,33 @@
+.ag-choice-chips .ag-segmented-choice__group,
+.ag-choice-chips__rail {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.ag-choice-chips .ag-segmented-choice__group::-webkit-scrollbar,
+.ag-choice-chips__rail::-webkit-scrollbar {
+  display: none;
+}
+.ag-choice-chips .ag-segmented-choice__option {
+  flex: 0 0 auto;
+}
+.ag-choice-chips .ag-segmented-choice__option span {
+  min-height: max(36px, var(--ag-control-height, 32px));
+  border-color: var(--ag-border);
+  border-radius: 999px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.ag-choice-chips .ag-segmented-choice__option input:checked + span {
+  border-color: var(--ag-accent);
+  background: var(--ag-surface-alt);
+}

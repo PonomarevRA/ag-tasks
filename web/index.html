@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ag-tasks</title>
+    <link rel="icon" type="image/svg+xml" href="/brand/app-icon.svg" />
+    <link rel="alternate icon" type="image/png" href="/brand/app.png" />
+    <link rel="apple-touch-icon" href="/brand/app.png" />
+    <link rel="stylesheet" href="/vendor/ag-design/tokens.css" />
+    <link rel="stylesheet" href="/vendor/ag-design/styles.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/design-adapter.css" />
+    <link rel="stylesheet" href="/planning.css" />
+    <script src="/shell.js"></script>
+    <script type="module" src="/app.js"></script>
+    <link rel="stylesheet" href="./agent-sessions.css" />
+    <link rel="stylesheet" href="/task-workbench.css" />
+    <link rel="stylesheet" href="/vendor/ag-charts/styles.css" />
+    <link rel="stylesheet" href="/vendor/ag-design/form-tracks.css" />
+    <link rel="stylesheet" href="/vendor/ag-design/select-indicator.css" />
+    <link rel="stylesheet" href="/work-analytics.css" />
+    <link rel="stylesheet" href="/manager.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">К содержимому</a>
+    <div class="app-window">
+      <header>
+        <div class="nav-header">
+          <button
+            class="ag-button ag-button--secondary ag-icon-button"
+            id="sidebar-toggle"
+            aria-label="Свернуть или развернуть меню"
+            aria-controls="sidebar"
+            aria-expanded="true"
+          >
+            ◧
+          </button>
+        </div>
+        <div class="content-header">
+          <div class="identity">
+            <span class="app-dot" aria-hidden="true"></span
+            ><strong>ag-tasks</strong
+            ><span class="subtitle">Задачи и изменения</span>
+          </div>
+        </div>
+      </header>
+      <div class="workspace">
+        <aside id="sidebar">
+          <nav class="ag-nav" aria-label="Разделы">
+            <div class="nav-group" role="group" aria-label="Сервис">
+              <p class="nav-group-label" aria-hidden="true">Сервис</p>
+              <button
+                type="button"
+                class="ag-button ag-button--quiet active"
+                data-view="sessions"
+                aria-label="Агенты и сессии"
+                title="Агенты и сессии"
+                aria-current="page"
+              >
+                <span class="nav-icon" aria-hidden="true">◉</span>
+                <span class="nav-label">Агенты и сессии</span>
+              </button>
+              <button
+                type="button"
+                class="ag-button ag-button--quiet"
+                data-view="analytics"
+                aria-label="Контроль задач"
+                title="Контроль задач"
+              >
+                <span class="nav-icon" aria-hidden="true">▥</span>
+                <span class="nav-label">Контроль задач</span>
+              </button>
+              <button
+                type="button"
+                class="ag-button ag-button--quiet"
+                data-view="repositories"
+                aria-label="Репозитории"
+                title="Репозитории"
+              >
+                <span class="nav-icon" aria-hidden="true">⌘</span>
+                <span class="nav-label">Репозитории</span>
+              </button>
+            </div>
+            <div class="nav-group" role="group" aria-label="Задачи пространства">
+              <p class="nav-group-label" aria-hidden="true">Задачи</p>
+              <button
+                type="button"
+                id="space-manage"
+                class="ag-button ag-button--quiet space-picker"
+                aria-haspopup="dialog"
+                aria-controls="spaces-dialog"
+                aria-label="Выбрать пространство"
+                title="Выбрать пространство"
+              >
+                <span class="nav-icon" aria-hidden="true">⊞</span>
+                <span class="nav-label" id="space-picker-label">Пространство</span>
+                <span class="nav-label space-picker-chevron" aria-hidden="true">⌄</span>
+              </button>
+              <button
+                type="button"
+                class="ag-button ag-button--quiet"
+                data-view="board"
+                aria-label="Канбан"
+                title="Канбан"
+              >
+                <span class="nav-icon" aria-hidden="true">▦</span>
+                <span class="nav-label">Канбан</span>
+              </button>
+              <button
+                type="button"
+                class="ag-button ag-button--quiet"
+                data-view="graph"
+                aria-label="Граф задач"
+                title="Граф задач"
+              >
+                <span class="nav-icon" aria-hidden="true">◇</span>
+                <span class="nav-label">Граф задач</span>
+              </button>
+              <button
+                type="button"
+                class="ag-button ag-button--quiet"
+                data-view="list"
+                aria-label="Все задачи"
+                title="Все задачи"
+              >
+                <span class="nav-icon" aria-hidden="true">☷</span>
+                <span class="nav-label">Все задачи</span>
+              </button>
+              <button
+                type="button"
+                class="ag-button ag-button--quiet"
+                data-view="reviews"
+                aria-label="Ожидают ревью"
+                title="Ожидают ревью"
+              >
+                <span class="nav-icon" aria-hidden="true">✓</span>
+                <span class="nav-label">Ожидают ревью</span>
+              </button>
+              <button
+                type="button"
+                class="ag-button ag-button--quiet"
+                data-view="archive"
+                aria-label="Архив"
+                title="Архив"
+              >
+                <span class="nav-icon" aria-hidden="true">▣</span>
+                <span class="nav-label">Архив</span>
+              </button>
+            </div>
+          </nav>
+        </aside>
+        <main id="main" tabindex="-1">
+          <div class="toolbar">
+            <div class="toolbar-title">
+              <h1 id="heading">Агенты и сессии</h1>
+              <p id="space-breadcrumb" class="space-breadcrumb"></p>
+            </div>
+            <div class="toolbar-actions">
+              <button class="ag-button ag-button--secondary" id="refresh">
+                Обновить</button
+              ><button id="create" class="primary ag-button ag-button--primary">
+                ＋ Задача
+              </button>
+            </div>
+          </div>
+          <div class="task-filter-bar">
+            <div class="view-filters" id="view-filters">
+              <label class="ag-field"
+                >Поиск в загруженных задачах<input
+                  id="issue-query"
+                  type="search"
+                  maxlength="240"
+                  placeholder="Название, номер, исполнитель…" /></label
+              ><label class="ag-field"
+                >Статус<select id="status-filter">
+                  <option value="">Все статусы</option>
+                </select></label
+              >
+            </div>
+            <label class="history-toggle"
+              ><input type="checkbox" id="include-history" /><span
+                >История и завершённые проверки</span
+              ></label
+            >
+            <label class="history-toggle active-work-toggle" hidden>
+              <input type="checkbox" id="active-work-only" aria-describedby="active-work-hint" />
+              <span>Агенты работают сейчас</span>
+              <span id="active-work-hint" class="muted">Только действующие рабочие сессии</span>
+            </label>
+            <label class="history-toggle board-empty-toggle" hidden>
+              <input type="checkbox" id="show-empty-columns" />
+              <span>Пустые колонки</span>
+            </label>
+            <button id="reset-filters" class="ag-button ag-button--secondary" hidden>Сбросить фильтры</button>
+          </div>
+          <div id="view-feedback" class="view-feedback" hidden>
+            <p id="view-load-status" role="status" aria-live="polite"></p>
+            <button id="retry-view" class="ag-button ag-button--secondary" hidden>Повторить загрузку</button>
+          </div>
+          <p id="coverage" class="coverage-notice" role="status"></p>
+          <p class="ag-notice" id="notice" role="status" aria-live="polite"></p>
+          <div id="content" aria-busy="false"></div>
+          <button class="ag-button ag-button--secondary" id="more" hidden>
+            Показать ещё
+          </button>
+        </main>
+      </div>
+    </div>
+    <dialog id="editor" aria-labelledby="editor-title">
+      <form id="issue-form">
+        <div class="dialog-heading">
+          <h2 id="editor-title">Новая задача</h2>
+          <button
+            class="ag-button ag-button--quiet ag-icon-button"
+            type="button"
+            data-close="editor"
+            aria-label="Закрыть"
+          >
+            ×
+          </button>
+        </div>
+        <div class="dialog-body">
+          <div class="issue-editor-layout">
+            <section class="issue-editor-main" aria-label="Содержание задачи">
+              <h3>Содержание</h3>
+              <label class="ag-field"
+                >Название<input
+                  name="title"
+                  required=""
+                  maxlength="240" /></label
+              ><label class="ag-field"
+                >Описание / план · Markdown<textarea
+                  name="description"
+                  rows="8"
+                  maxlength="16000"
+                  placeholder="# Цель
+
+## Изменения
+- …
+
+## Проверки
+- …"
+                ></textarea>
+              </label>
+            </section>
+            <section class="issue-editor-context" aria-label="Параметры задачи">
+              <h3>Контекст задачи</h3>
+              <div class="field-grid">
+                <label class="ag-field"
+                  >Пространство<select name="spaceId"></select></label
+                ><label class="ag-field"
+                  >Роль<select name="intendedRole"></select></label
+                ><label class="ag-field"
+                  >Тип<select name="kind">
+                    <option value="task">Задача</option>
+                    <option value="rnd">RnD · План</option>
+                  </select></label
+                ><label class="ag-field"
+                  >Приоритет<select name="priority">
+                    <option value="normal">Обычный</option>
+                    <option value="low">Низкий</option>
+                    <option value="high">Высокий</option>
+                    <option value="urgent">Срочный</option>
+                  </select></label
+                >
+              </div>
+            </section>
+          </div>
+          <details class="editor-options" data-editor-group="code">
+            <summary>Код и связи</summary>
+            <div class="field-grid">
+              <label class="ag-field"
+                >Работа с кодом<input name="codeTask" type="checkbox" /></label
+              ><label class="ag-field"
+                >Языки · через запятую<input
+                  name="languages"
+                  maxlength="1040"
+                  placeholder="Python, TypeScript, SQL" /></label
+              ><label class="ag-field"
+                >Системы · через запятую<input
+                  name="systems"
+                  maxlength="1040"
+                  placeholder="ag-tasks, ag-observer" /></label
+              ><label class="ag-field"
+                >Родительская задача<select name="parentId"></select></label
+              ><label class="ag-field"
+                >Репозиторий<select name="repoId"></select
+              ></label>
+            </div>
+          </details>
+          <details class="editor-options" data-editor-group="estimate">
+            <summary>Оценка, исполнитель и материалы</summary>
+            <div class="field-grid">
+              <label class="ag-field"
+                >Предполагаемая сложность<select name="estimatedPoints">
+                  <option value="">Не оценена</option>
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>5</option>
+                  <option>8</option>
+                  <option>13</option>
+                </select></label
+              ><label class="ag-field"
+                >Основание оценки<textarea
+                  name="estimatedReason"
+                  rows="2"
+                  maxlength="2048"
+                ></textarea></label
+              ><label class="ag-field"
+                >Исполнитель<input
+                  name="assignee"
+                  maxlength="120"
+                  placeholder="Агент или команда" /></label
+              ><label class="ag-field" data-ag-width="content" data-ag-width-min-em="6"
+                >Срок выполнения (UTC)<input
+                  name="dueDate"
+                  type="date"
+                  data-ag-width="content"
+                  data-ag-width-min-em="6"
+                  min="0001-01-01"
+                  max="9999-12-31" /></label
+              ><label class="ag-field"
+                >Ссылка на инцидент или доказательства<input
+                  name="evidence"
+                  type="url"
+                  maxlength="2048"
+                  placeholder="http://127.0.0.1:8890/…"
+              /></label>
+            </div>
+          </details>
+          <details class="editor-options" data-editor-group="criteria">
+            <summary>Готовность и завершение · DoR / DoD</summary>
+            <fieldset class="criteria-fieldset">
+              <legend>DoR · Готовность к работе</legend>
+              <div id="dor-editor"></div>
+            </fieldset>
+            <fieldset class="criteria-fieldset">
+              <legend>DoD · Критерии завершения</legend>
+              <div id="dod-editor"></div>
+            </fieldset>
+            <p class="muted">
+              Пустой список допустим для черновика. Начало работы потребует роли
+              и подтверждённых критериев DoR.
+            </p>
+            <p class="muted">
+              Ссылки сохраняются как контекст. Observer не нужен для работы с
+              задачей.
+            </p>
+          </details>
+        </div>
+        <div class="dialog-actions">
+          <button
+            class="ag-button ag-button--quiet"
+            type="button"
+            data-close="editor"
+          >
+            Отмена</button
+          ><button class="primary ag-button ag-button--primary" type="submit">
+            Создать
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="detail" aria-labelledby="detail-title">
+      <div class="dialog-heading">
+        <h2 id="detail-title"></h2>
+        <button
+          class="ag-button ag-button--quiet ag-icon-button"
+          data-close="detail"
+          aria-label="Закрыть"
+        >
+          ×
+        </button>
+      </div>
+      <p
+        id="detail-feedback"
+        class="detail-feedback"
+        role="status"
+        aria-live="polite"
+      ></p>
+      <div id="detail-body" class="dialog-body"></div>
+    </dialog>
+    <dialog id="approval" aria-labelledby="approval-title">
+      <div class="dialog-heading">
+        <h2 id="approval-title">Проверка и слияние</h2>
+        <button
+          class="ag-button ag-button--quiet ag-icon-button"
+          data-close="approval"
+          aria-label="Закрыть"
+        >
+          ×
+        </button>
+      </div>
+      <div class="dialog-body">
+        <div id="review-body"></div>
+        <label class="consent"
+          ><input id="merge-consent" type="checkbox" />Я просмотрел изменения и
+          одобряю слияние этой версии</label
+        >
+      </div>
+      <div class="dialog-actions">
+        <button class="ag-button ag-button--quiet" data-close="approval">
+          Закрыть</button
+        ><button
+          id="merge"
+          class="primary ag-button ag-button--primary"
+          disabled=""
+        >
+          Одобрить и слить
+        </button>
+      </div>
+    </dialog>
+    <dialog id="spaces-dialog" aria-labelledby="spaces-title">
+      <div class="dialog-heading">
+        <h2 id="spaces-title">Пространства</h2>
+        <button
+          type="button"
+          class="ag-button ag-icon-button"
+          data-close="spaces-dialog"
+          aria-label="Закрыть"
+        >
+          ×
+        </button>
+      </div>
+      <div class="dialog-body">
+        <div id="space-list" class="space-list"></div>
+        <form id="space-form" class="space-editor-form">
+          <label for="space-name" class="space-name-label">Название пространства</label>
+          <input id="space-name" name="name" required="" maxlength="128" />
+          <label for="space-prefix" class="space-prefix-label">Префикс</label>
+          <input id="space-prefix" name="prefix" maxlength="32"
+            pattern="[A-Za-z][A-Za-z0-9]*" placeholder="HP"
+            aria-describedby="space-prefix-hint" />
+          <small id="space-prefix-hint">Уникальный. Рекомендуется до 4 символов.</small>
+          <button type="submit" class="ag-button ag-button--primary">
+            Создать
+          </button>
+        </form>
+      </div>
+    </dialog>
+    <dialog id="delete-dialog" aria-labelledby="delete-title">
+      <form id="delete-form">
+        <div class="dialog-heading">
+          <h2 id="delete-title">Удалить задачу из списков?</h2>
+          <button type="button" data-close="delete-dialog" aria-label="Закрыть">
+            ×
+          </button>
+        </div>
+        <div class="dialog-body">
+          <p id="delete-description"></p>
+          <p>
+            Сервис сохранит запись об удалении и историю. Рабочие директории и
+            репозитории не удаляются. Сервер отклонит удаление при оставшихся
+            связях или подзадачах.
+          </p>
+          <label class="consent"
+            ><input
+              type="checkbox"
+              id="delete-consent"
+              required=""
+            />Подтверждаю удаление этой архивной задачи</label
+          >
+        </div>
+        <div class="dialog-actions">
+          <button type="button" data-close="delete-dialog">Отмена</button
+          ><button type="submit" class="danger-action">Удалить задачу</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>

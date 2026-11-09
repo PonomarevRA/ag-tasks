@@ -1,0 +1,9 @@
+{
+  "appId": "ag-tasks",
+  "name": "Ag Tasks",
+  "version": "0.8.2",
+  "binary": "AgTasks",
+  "bundleId": "local.ag-tasks.desktop",
+  "repository": "PonomarevRA/ag-tasks",
+  "defaultDataName": "AgTasks"
+}

@@ -1,0 +1,1331 @@
+{
+  "contract": "agent-activity-http/v1",
+  "cases": [
+    {
+      "application": "atlas",
+      "status": {
+        "schemaVersion": "agent-activity-http/v1",
+        "application": "atlas",
+        "eventSchemaVersion": "agent-activity/v1",
+        "journalEpoch": "http-example-epoch",
+        "oldestSequence": "3",
+        "latestSequence": "10",
+        "maxSizeBytes": 50000000,
+        "usedBytes": 12345,
+        "cursor": {
+          "journalEpoch": "http-example-epoch",
+          "sequence": "10"
+        },
+        "limits": {
+          "maxPageEvents": 100,
+          "maxPageBytes": 262144
+        },
+        "health": {
+          "status": "ok",
+          "droppedTotal": 0,
+          "queueItems": 0,
+          "queueBytes": 0,
+          "errorCode": null
+        }
+      },
+      "visibleEvents": [
+        {
+          "schemaVersion": "agent-activity/v1",
+          "eventId": "atlas-http-3",
+          "journalEpoch": "http-example-epoch",
+          "sequence": "3",
+          "occurredAt": "2026-10-21T12:00:00Z",
+          "recordedAt": "2026-10-21T12:00:00Z",
+          "application": "atlas",
+          "source": "mcp",
+          "clientKind": "codex",
+          "sessionId": "example-session",
+          "agentId": null,
+          "identityQuality": "process",
+          "operationId": "operation-3",
+          "operation": "search",
+          "phase": "finished",
+          "outcome": "succeeded",
+          "durationMs": 4.5,
+          "resultCount": 1,
+          "query": {
+            "mode": "preview",
+            "preview": "alpha",
+            "truncated": false
+          },
+          "target": {
+            "kind": "code",
+            "projectId": "example-project",
+            "nodeId": "example-node",
+            "snapshotId": "example-snapshot",
+            "label": "Calculate",
+            "status": "available"
+          },
+          "request": {
+            "tool": "describe-node",
+            "summary": "Описать узел Calculate"
+          },
+          "response": {
+            "summary": "Получено описание Calculate: метод расчёта",
+            "resultCount": 1,
+            "items": [
+              {
+                "label": "Calculate",
+                "nodeId": "example-node",
+                "file": "src/Calculator.cs"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "schemaVersion": "agent-activity/v1",
+          "eventId": "atlas-http-5",
+          "journalEpoch": "http-example-epoch",
+          "sequence": "5",
+          "occurredAt": "2026-10-21T12:00:00Z",
+          "recordedAt": "2026-10-21T12:00:00Z",
+          "application": "atlas",
+          "source": "mcp",
+          "clientKind": "codex",
+          "sessionId": "example-session",
+          "agentId": null,
+          "identityQuality": "process",
+          "operationId": "operation-5",
+          "operation": "search",
+          "phase": "finished",
+          "outcome": "succeeded",
+          "durationMs": 4.5,
+          "resultCount": 1,
+          "query": {
+            "mode": "preview",
+            "preview": "beta",
+            "truncated": false
+          },
+          "target": {
+            "kind": "code",
+            "projectId": "example-project",
+            "nodeId": "example-node",
+            "snapshotId": "example-snapshot",
+            "label": "Calculate",
+            "status": "available"
+          },
+          "request": {
+            "tool": "describe-node",
+            "summary": "Описать узел Calculate"
+          },
+          "response": {
+            "summary": "Получено описание Calculate: метод расчёта",
+            "resultCount": 1,
+            "items": [
+              {
+                "label": "Calculate",
+                "nodeId": "example-node",
+                "file": "src/Calculator.cs"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "schemaVersion": "agent-activity/v1",
+          "eventId": "atlas-http-8",
+          "journalEpoch": "http-example-epoch",
+          "sequence": "8",
+          "occurredAt": "2026-10-21T12:00:00Z",
+          "recordedAt": "2026-10-21T12:00:00Z",
+          "application": "atlas",
+          "source": "mcp",
+          "clientKind": "codex",
+          "sessionId": "example-session",
+          "agentId": null,
+          "identityQuality": "process",
+          "operationId": "operation-8",
+          "operation": "search",
+          "phase": "finished",
+          "outcome": "succeeded",
+          "durationMs": 4.5,
+          "resultCount": 1,
+          "query": {
+            "mode": "preview",
+            "preview": "alpha beta",
+            "truncated": false
+          },
+          "target": {
+            "kind": "code",
+            "projectId": "example-project",
+            "nodeId": "example-node",
+            "snapshotId": "example-snapshot",
+            "label": "Calculate",
+            "status": "available"
+          },
+          "request": {
+            "tool": "describe-node",
+            "summary": "Описать узел Calculate"
+          },
+          "response": {
+            "summary": "Получено описание Calculate: метод расчёта",
+            "resultCount": 1,
+            "items": [
+              {
+                "label": "Calculate",
+                "nodeId": "example-node",
+                "file": "src/Calculator.cs"
+              }
+            ],
+            "truncated": false
+          }
+        }
+      ],
+      "pages": [
+        {
+          "query": "limit=2",
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "atlas",
+            "direction": "backward",
+            "events": [
+              {
+                "schemaVersion": "agent-activity/v1",
+                "eventId": "atlas-http-5",
+                "journalEpoch": "http-example-epoch",
+                "sequence": "5",
+                "occurredAt": "2026-10-21T12:00:00Z",
+                "recordedAt": "2026-10-21T12:00:00Z",
+                "application": "atlas",
+                "source": "mcp",
+                "clientKind": "codex",
+                "sessionId": "example-session",
+                "agentId": null,
+                "identityQuality": "process",
+                "operationId": "operation-5",
+                "operation": "search",
+                "phase": "finished",
+                "outcome": "succeeded",
+                "durationMs": 4.5,
+                "resultCount": 1,
+                "query": {
+                  "mode": "preview",
+                  "preview": "beta",
+                  "truncated": false
+                },
+                "target": {
+                  "kind": "code",
+                  "projectId": "example-project",
+                  "nodeId": "example-node",
+                  "snapshotId": "example-snapshot",
+                  "label": "Calculate",
+                  "status": "available"
+                },
+                "request": {
+                  "tool": "describe-node",
+                  "summary": "Описать узел Calculate"
+                },
+                "response": {
+                  "summary": "Получено описание Calculate: метод расчёта",
+                  "resultCount": 1,
+                  "items": [
+                    {
+                      "label": "Calculate",
+                      "nodeId": "example-node",
+                      "file": "src/Calculator.cs"
+                    }
+                  ],
+                  "truncated": false
+                }
+              },
+              {
+                "schemaVersion": "agent-activity/v1",
+                "eventId": "atlas-http-8",
+                "journalEpoch": "http-example-epoch",
+                "sequence": "8",
+                "occurredAt": "2026-10-21T12:00:00Z",
+                "recordedAt": "2026-10-21T12:00:00Z",
+                "application": "atlas",
+                "source": "mcp",
+                "clientKind": "codex",
+                "sessionId": "example-session",
+                "agentId": null,
+                "identityQuality": "process",
+                "operationId": "operation-8",
+                "operation": "search",
+                "phase": "finished",
+                "outcome": "succeeded",
+                "durationMs": 4.5,
+                "resultCount": 1,
+                "query": {
+                  "mode": "preview",
+                  "preview": "alpha beta",
+                  "truncated": false
+                },
+                "target": {
+                  "kind": "code",
+                  "projectId": "example-project",
+                  "nodeId": "example-node",
+                  "snapshotId": "example-snapshot",
+                  "label": "Calculate",
+                  "status": "available"
+                },
+                "request": {
+                  "tool": "describe-node",
+                  "summary": "Описать узел Calculate"
+                },
+                "response": {
+                  "summary": "Получено описание Calculate: метод расчёта",
+                  "resultCount": 1,
+                  "items": [
+                    {
+                      "label": "Calculate",
+                      "nodeId": "example-node",
+                      "file": "src/Calculator.cs"
+                    }
+                  ],
+                  "truncated": false
+                }
+              }
+            ],
+            "nextCursor": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "5"
+            },
+            "highWatermark": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            },
+            "oldestSequence": "3",
+            "hasMore": true,
+            "truncated": false,
+            "health": {
+              "status": "ok",
+              "droppedTotal": 0,
+              "queueItems": 0,
+              "queueBytes": 0,
+              "errorCode": null
+            }
+          }
+        },
+        {
+          "query": "beforeSequence=5&journalEpoch=http-example-epoch&limit=2",
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "atlas",
+            "direction": "backward",
+            "events": [
+              {
+                "schemaVersion": "agent-activity/v1",
+                "eventId": "atlas-http-3",
+                "journalEpoch": "http-example-epoch",
+                "sequence": "3",
+                "occurredAt": "2026-10-21T12:00:00Z",
+                "recordedAt": "2026-10-21T12:00:00Z",
+                "application": "atlas",
+                "source": "mcp",
+                "clientKind": "codex",
+                "sessionId": "example-session",
+                "agentId": null,
+                "identityQuality": "process",
+                "operationId": "operation-3",
+                "operation": "search",
+                "phase": "finished",
+                "outcome": "succeeded",
+                "durationMs": 4.5,
+                "resultCount": 1,
+                "query": {
+                  "mode": "preview",
+                  "preview": "alpha",
+                  "truncated": false
+                },
+                "target": {
+                  "kind": "code",
+                  "projectId": "example-project",
+                  "nodeId": "example-node",
+                  "snapshotId": "example-snapshot",
+                  "label": "Calculate",
+                  "status": "available"
+                },
+                "request": {
+                  "tool": "describe-node",
+                  "summary": "Описать узел Calculate"
+                },
+                "response": {
+                  "summary": "Получено описание Calculate: метод расчёта",
+                  "resultCount": 1,
+                  "items": [
+                    {
+                      "label": "Calculate",
+                      "nodeId": "example-node",
+                      "file": "src/Calculator.cs"
+                    }
+                  ],
+                  "truncated": false
+                }
+              }
+            ],
+            "nextCursor": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "2"
+            },
+            "highWatermark": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            },
+            "oldestSequence": "3",
+            "hasMore": false,
+            "truncated": false,
+            "health": {
+              "status": "ok",
+              "droppedTotal": 0,
+              "queueItems": 0,
+              "queueBytes": 0,
+              "errorCode": null
+            }
+          }
+        },
+        {
+          "query": "afterSequence=2&journalEpoch=http-example-epoch&limit=2",
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "atlas",
+            "direction": "forward",
+            "events": [
+              {
+                "schemaVersion": "agent-activity/v1",
+                "eventId": "atlas-http-3",
+                "journalEpoch": "http-example-epoch",
+                "sequence": "3",
+                "occurredAt": "2026-10-21T12:00:00Z",
+                "recordedAt": "2026-10-21T12:00:00Z",
+                "application": "atlas",
+                "source": "mcp",
+                "clientKind": "codex",
+                "sessionId": "example-session",
+                "agentId": null,
+                "identityQuality": "process",
+                "operationId": "operation-3",
+                "operation": "search",
+                "phase": "finished",
+                "outcome": "succeeded",
+                "durationMs": 4.5,
+                "resultCount": 1,
+                "query": {
+                  "mode": "preview",
+                  "preview": "alpha",
+                  "truncated": false
+                },
+                "target": {
+                  "kind": "code",
+                  "projectId": "example-project",
+                  "nodeId": "example-node",
+                  "snapshotId": "example-snapshot",
+                  "label": "Calculate",
+                  "status": "available"
+                },
+                "request": {
+                  "tool": "describe-node",
+                  "summary": "Описать узел Calculate"
+                },
+                "response": {
+                  "summary": "Получено описание Calculate: метод расчёта",
+                  "resultCount": 1,
+                  "items": [
+                    {
+                      "label": "Calculate",
+                      "nodeId": "example-node",
+                      "file": "src/Calculator.cs"
+                    }
+                  ],
+                  "truncated": false
+                }
+              },
+              {
+                "schemaVersion": "agent-activity/v1",
+                "eventId": "atlas-http-5",
+                "journalEpoch": "http-example-epoch",
+                "sequence": "5",
+                "occurredAt": "2026-10-21T12:00:00Z",
+                "recordedAt": "2026-10-21T12:00:00Z",
+                "application": "atlas",
+                "source": "mcp",
+                "clientKind": "codex",
+                "sessionId": "example-session",
+                "agentId": null,
+                "identityQuality": "process",
+                "operationId": "operation-5",
+                "operation": "search",
+                "phase": "finished",
+                "outcome": "succeeded",
+                "durationMs": 4.5,
+                "resultCount": 1,
+                "query": {
+                  "mode": "preview",
+                  "preview": "beta",
+                  "truncated": false
+                },
+                "target": {
+                  "kind": "code",
+                  "projectId": "example-project",
+                  "nodeId": "example-node",
+                  "snapshotId": "example-snapshot",
+                  "label": "Calculate",
+                  "status": "available"
+                },
+                "request": {
+                  "tool": "describe-node",
+                  "summary": "Описать узел Calculate"
+                },
+                "response": {
+                  "summary": "Получено описание Calculate: метод расчёта",
+                  "resultCount": 1,
+                  "items": [
+                    {
+                      "label": "Calculate",
+                      "nodeId": "example-node",
+                      "file": "src/Calculator.cs"
+                    }
+                  ],
+                  "truncated": false
+                }
+              }
+            ],
+            "nextCursor": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "5"
+            },
+            "highWatermark": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            },
+            "oldestSequence": "3",
+            "hasMore": true,
+            "truncated": false,
+            "health": {
+              "status": "ok",
+              "droppedTotal": 0,
+              "queueItems": 0,
+              "queueBytes": 0,
+              "errorCode": null
+            }
+          }
+        },
+        {
+          "query": "afterSequence=5&journalEpoch=http-example-epoch&limit=2",
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "atlas",
+            "direction": "forward",
+            "events": [
+              {
+                "schemaVersion": "agent-activity/v1",
+                "eventId": "atlas-http-8",
+                "journalEpoch": "http-example-epoch",
+                "sequence": "8",
+                "occurredAt": "2026-10-21T12:00:00Z",
+                "recordedAt": "2026-10-21T12:00:00Z",
+                "application": "atlas",
+                "source": "mcp",
+                "clientKind": "codex",
+                "sessionId": "example-session",
+                "agentId": null,
+                "identityQuality": "process",
+                "operationId": "operation-8",
+                "operation": "search",
+                "phase": "finished",
+                "outcome": "succeeded",
+                "durationMs": 4.5,
+                "resultCount": 1,
+                "query": {
+                  "mode": "preview",
+                  "preview": "alpha beta",
+                  "truncated": false
+                },
+                "target": {
+                  "kind": "code",
+                  "projectId": "example-project",
+                  "nodeId": "example-node",
+                  "snapshotId": "example-snapshot",
+                  "label": "Calculate",
+                  "status": "available"
+                },
+                "request": {
+                  "tool": "describe-node",
+                  "summary": "Описать узел Calculate"
+                },
+                "response": {
+                  "summary": "Получено описание Calculate: метод расчёта",
+                  "resultCount": 1,
+                  "items": [
+                    {
+                      "label": "Calculate",
+                      "nodeId": "example-node",
+                      "file": "src/Calculator.cs"
+                    }
+                  ],
+                  "truncated": false
+                }
+              }
+            ],
+            "nextCursor": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            },
+            "highWatermark": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            },
+            "oldestSequence": "3",
+            "hasMore": false,
+            "truncated": false,
+            "health": {
+              "status": "ok",
+              "droppedTotal": 0,
+              "queueItems": 0,
+              "queueBytes": 0,
+              "errorCode": null
+            }
+          }
+        },
+        {
+          "query": "afterSequence=2&journalEpoch=http-example-epoch&q=unmatched",
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "atlas",
+            "direction": "forward",
+            "events": [],
+            "nextCursor": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            },
+            "highWatermark": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            },
+            "oldestSequence": "3",
+            "hasMore": false,
+            "truncated": false,
+            "health": {
+              "status": "ok",
+              "droppedTotal": 0,
+              "queueItems": 0,
+              "queueBytes": 0,
+              "errorCode": null
+            }
+          }
+        }
+      ],
+      "errors": [
+        {
+          "statusCode": 400,
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "atlas",
+            "error": {
+              "code": "invalid_query",
+              "message": "Invalid query parameters.",
+              "retryable": false
+            },
+            "resetCursor": null
+          }
+        },
+        {
+          "statusCode": 403,
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "atlas",
+            "error": {
+              "code": "forbidden",
+              "message": "Access forbidden.",
+              "retryable": false
+            },
+            "resetCursor": null
+          }
+        },
+        {
+          "statusCode": 409,
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "atlas",
+            "error": {
+              "code": "cursor_expired",
+              "message": "Cursor has expired.",
+              "retryable": false
+            },
+            "resetCursor": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            }
+          }
+        },
+        {
+          "statusCode": 503,
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "atlas",
+            "error": {
+              "code": "journal_unavailable",
+              "message": "Journal is unavailable.",
+              "retryable": true
+            },
+            "resetCursor": null
+          }
+        }
+      ]
+    },
+    {
+      "application": "agmemory",
+      "status": {
+        "schemaVersion": "agent-activity-http/v1",
+        "application": "agmemory",
+        "eventSchemaVersion": "agent-activity/v1",
+        "journalEpoch": "http-example-epoch",
+        "oldestSequence": "3",
+        "latestSequence": "10",
+        "maxSizeBytes": 50000000,
+        "usedBytes": 12345,
+        "cursor": {
+          "journalEpoch": "http-example-epoch",
+          "sequence": "10"
+        },
+        "limits": {
+          "maxPageEvents": 100,
+          "maxPageBytes": 262144
+        },
+        "health": {
+          "status": "ok",
+          "droppedTotal": 0,
+          "queueItems": null,
+          "queueBytes": null,
+          "errorCode": null
+        }
+      },
+      "visibleEvents": [
+        {
+          "schemaVersion": "agent-activity/v1",
+          "eventId": "agmemory-http-3",
+          "journalEpoch": "http-example-epoch",
+          "sequence": "3",
+          "occurredAt": "2026-10-21T12:00:00Z",
+          "recordedAt": "2026-10-21T12:00:00Z",
+          "application": "agmemory",
+          "source": "mcp",
+          "clientKind": "codex",
+          "sessionId": "example-session",
+          "agentId": null,
+          "identityQuality": "process",
+          "operationId": "operation-3",
+          "operation": "search",
+          "phase": "finished",
+          "outcome": "succeeded",
+          "durationMs": 4.5,
+          "resultCount": 1,
+          "query": {
+            "mode": "preview",
+            "preview": "alpha",
+            "truncated": false
+          },
+          "target": {
+            "kind": "memory",
+            "nodeKey": "example-opaque-node",
+            "generation": "example-generation",
+            "status": "available"
+          },
+          "request": {
+            "tool": "memory_recall",
+            "summary": "Найти сведения о настройках журналирования; limit=3"
+          },
+          "response": {
+            "summary": "Найдена 1 запись; тип Outcome",
+            "resultCount": 1,
+            "items": [
+              {
+                "label": "Outcome"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "schemaVersion": "agent-activity/v1",
+          "eventId": "agmemory-http-5",
+          "journalEpoch": "http-example-epoch",
+          "sequence": "5",
+          "occurredAt": "2026-10-21T12:00:00Z",
+          "recordedAt": "2026-10-21T12:00:00Z",
+          "application": "agmemory",
+          "source": "mcp",
+          "clientKind": "codex",
+          "sessionId": "example-session",
+          "agentId": null,
+          "identityQuality": "process",
+          "operationId": "operation-5",
+          "operation": "search",
+          "phase": "finished",
+          "outcome": "succeeded",
+          "durationMs": 4.5,
+          "resultCount": 1,
+          "query": {
+            "mode": "preview",
+            "preview": "beta",
+            "truncated": false
+          },
+          "target": {
+            "kind": "memory",
+            "nodeKey": "example-opaque-node",
+            "generation": "example-generation",
+            "status": "available"
+          },
+          "request": {
+            "tool": "memory_recall",
+            "summary": "Найти сведения о настройках журналирования; limit=3"
+          },
+          "response": {
+            "summary": "Найдена 1 запись; тип Outcome",
+            "resultCount": 1,
+            "items": [
+              {
+                "label": "Outcome"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "schemaVersion": "agent-activity/v1",
+          "eventId": "agmemory-http-8",
+          "journalEpoch": "http-example-epoch",
+          "sequence": "8",
+          "occurredAt": "2026-10-21T12:00:00Z",
+          "recordedAt": "2026-10-21T12:00:00Z",
+          "application": "agmemory",
+          "source": "mcp",
+          "clientKind": "codex",
+          "sessionId": "example-session",
+          "agentId": null,
+          "identityQuality": "process",
+          "operationId": "operation-8",
+          "operation": "search",
+          "phase": "finished",
+          "outcome": "succeeded",
+          "durationMs": 4.5,
+          "resultCount": 1,
+          "query": {
+            "mode": "preview",
+            "preview": "alpha beta",
+            "truncated": false
+          },
+          "target": {
+            "kind": "memory",
+            "nodeKey": "example-opaque-node",
+            "generation": "example-generation",
+            "status": "available"
+          },
+          "request": {
+            "tool": "memory_recall",
+            "summary": "Найти сведения о настройках журналирования; limit=3"
+          },
+          "response": {
+            "summary": "Найдена 1 запись; тип Outcome",
+            "resultCount": 1,
+            "items": [
+              {
+                "label": "Outcome"
+              }
+            ],
+            "truncated": false
+          }
+        }
+      ],
+      "pages": [
+        {
+          "query": "limit=2",
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "agmemory",
+            "direction": "backward",
+            "events": [
+              {
+                "schemaVersion": "agent-activity/v1",
+                "eventId": "agmemory-http-5",
+                "journalEpoch": "http-example-epoch",
+                "sequence": "5",
+                "occurredAt": "2026-10-21T12:00:00Z",
+                "recordedAt": "2026-10-21T12:00:00Z",
+                "application": "agmemory",
+                "source": "mcp",
+                "clientKind": "codex",
+                "sessionId": "example-session",
+                "agentId": null,
+                "identityQuality": "process",
+                "operationId": "operation-5",
+                "operation": "search",
+                "phase": "finished",
+                "outcome": "succeeded",
+                "durationMs": 4.5,
+                "resultCount": 1,
+                "query": {
+                  "mode": "preview",
+                  "preview": "beta",
+                  "truncated": false
+                },
+                "target": {
+                  "kind": "memory",
+                  "nodeKey": "example-opaque-node",
+                  "generation": "example-generation",
+                  "status": "available"
+                },
+                "request": {
+                  "tool": "memory_recall",
+                  "summary": "Найти сведения о настройках журналирования; limit=3"
+                },
+                "response": {
+                  "summary": "Найдена 1 запись; тип Outcome",
+                  "resultCount": 1,
+                  "items": [
+                    {
+                      "label": "Outcome"
+                    }
+                  ],
+                  "truncated": false
+                }
+              },
+              {
+                "schemaVersion": "agent-activity/v1",
+                "eventId": "agmemory-http-8",
+                "journalEpoch": "http-example-epoch",
+                "sequence": "8",
+                "occurredAt": "2026-10-21T12:00:00Z",
+                "recordedAt": "2026-10-21T12:00:00Z",
+                "application": "agmemory",
+                "source": "mcp",
+                "clientKind": "codex",
+                "sessionId": "example-session",
+                "agentId": null,
+                "identityQuality": "process",
+                "operationId": "operation-8",
+                "operation": "search",
+                "phase": "finished",
+                "outcome": "succeeded",
+                "durationMs": 4.5,
+                "resultCount": 1,
+                "query": {
+                  "mode": "preview",
+                  "preview": "alpha beta",
+                  "truncated": false
+                },
+                "target": {
+                  "kind": "memory",
+                  "nodeKey": "example-opaque-node",
+                  "generation": "example-generation",
+                  "status": "available"
+                },
+                "request": {
+                  "tool": "memory_recall",
+                  "summary": "Найти сведения о настройках журналирования; limit=3"
+                },
+                "response": {
+                  "summary": "Найдена 1 запись; тип Outcome",
+                  "resultCount": 1,
+                  "items": [
+                    {
+                      "label": "Outcome"
+                    }
+                  ],
+                  "truncated": false
+                }
+              }
+            ],
+            "nextCursor": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "5"
+            },
+            "highWatermark": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            },
+            "oldestSequence": "3",
+            "hasMore": true,
+            "truncated": false,
+            "health": {
+              "status": "ok",
+              "droppedTotal": 0,
+              "queueItems": null,
+              "queueBytes": null,
+              "errorCode": null
+            }
+          }
+        },
+        {
+          "query": "beforeSequence=5&journalEpoch=http-example-epoch&limit=2",
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "agmemory",
+            "direction": "backward",
+            "events": [
+              {
+                "schemaVersion": "agent-activity/v1",
+                "eventId": "agmemory-http-3",
+                "journalEpoch": "http-example-epoch",
+                "sequence": "3",
+                "occurredAt": "2026-10-21T12:00:00Z",
+                "recordedAt": "2026-10-21T12:00:00Z",
+                "application": "agmemory",
+                "source": "mcp",
+                "clientKind": "codex",
+                "sessionId": "example-session",
+                "agentId": null,
+                "identityQuality": "process",
+                "operationId": "operation-3",
+                "operation": "search",
+                "phase": "finished",
+                "outcome": "succeeded",
+                "durationMs": 4.5,
+                "resultCount": 1,
+                "query": {
+                  "mode": "preview",
+                  "preview": "alpha",
+                  "truncated": false
+                },
+                "target": {
+                  "kind": "memory",
+                  "nodeKey": "example-opaque-node",
+                  "generation": "example-generation",
+                  "status": "available"
+                },
+                "request": {
+                  "tool": "memory_recall",
+                  "summary": "Найти сведения о настройках журналирования; limit=3"
+                },
+                "response": {
+                  "summary": "Найдена 1 запись; тип Outcome",
+                  "resultCount": 1,
+                  "items": [
+                    {
+                      "label": "Outcome"
+                    }
+                  ],
+                  "truncated": false
+                }
+              }
+            ],
+            "nextCursor": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "2"
+            },
+            "highWatermark": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            },
+            "oldestSequence": "3",
+            "hasMore": false,
+            "truncated": false,
+            "health": {
+              "status": "ok",
+              "droppedTotal": 0,
+              "queueItems": null,
+              "queueBytes": null,
+              "errorCode": null
+            }
+          }
+        },
+        {
+          "query": "afterSequence=2&journalEpoch=http-example-epoch&limit=2",
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "agmemory",
+            "direction": "forward",
+            "events": [
+              {
+                "schemaVersion": "agent-activity/v1",
+                "eventId": "agmemory-http-3",
+                "journalEpoch": "http-example-epoch",
+                "sequence": "3",
+                "occurredAt": "2026-10-21T12:00:00Z",
+                "recordedAt": "2026-10-21T12:00:00Z",
+                "application": "agmemory",
+                "source": "mcp",
+                "clientKind": "codex",
+                "sessionId": "example-session",
+                "agentId": null,
+                "identityQuality": "process",
+                "operationId": "operation-3",
+                "operation": "search",
+                "phase": "finished",
+                "outcome": "succeeded",
+                "durationMs": 4.5,
+                "resultCount": 1,
+                "query": {
+                  "mode": "preview",
+                  "preview": "alpha",
+                  "truncated": false
+                },
+                "target": {
+                  "kind": "memory",
+                  "nodeKey": "example-opaque-node",
+                  "generation": "example-generation",
+                  "status": "available"
+                },
+                "request": {
+                  "tool": "memory_recall",
+                  "summary": "Найти сведения о настройках журналирования; limit=3"
+                },
+                "response": {
+                  "summary": "Найдена 1 запись; тип Outcome",
+                  "resultCount": 1,
+                  "items": [
+                    {
+                      "label": "Outcome"
+                    }
+                  ],
+                  "truncated": false
+                }
+              },
+              {
+                "schemaVersion": "agent-activity/v1",
+                "eventId": "agmemory-http-5",
+                "journalEpoch": "http-example-epoch",
+                "sequence": "5",
+                "occurredAt": "2026-10-21T12:00:00Z",
+                "recordedAt": "2026-10-21T12:00:00Z",
+                "application": "agmemory",
+                "source": "mcp",
+                "clientKind": "codex",
+                "sessionId": "example-session",
+                "agentId": null,
+                "identityQuality": "process",
+                "operationId": "operation-5",
+                "operation": "search",
+                "phase": "finished",
+                "outcome": "succeeded",
+                "durationMs": 4.5,
+                "resultCount": 1,
+                "query": {
+                  "mode": "preview",
+                  "preview": "beta",
+                  "truncated": false
+                },
+                "target": {
+                  "kind": "memory",
+                  "nodeKey": "example-opaque-node",
+                  "generation": "example-generation",
+                  "status": "available"
+                },
+                "request": {
+                  "tool": "memory_recall",
+                  "summary": "Найти сведения о настройках журналирования; limit=3"
+                },
+                "response": {
+                  "summary": "Найдена 1 запись; тип Outcome",
+                  "resultCount": 1,
+                  "items": [
+                    {
+                      "label": "Outcome"
+                    }
+                  ],
+                  "truncated": false
+                }
+              }
+            ],
+            "nextCursor": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "5"
+            },
+            "highWatermark": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            },
+            "oldestSequence": "3",
+            "hasMore": true,
+            "truncated": false,
+            "health": {
+              "status": "ok",
+              "droppedTotal": 0,
+              "queueItems": null,
+              "queueBytes": null,
+              "errorCode": null
+            }
+          }
+        },
+        {
+          "query": "afterSequence=5&journalEpoch=http-example-epoch&limit=2",
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "agmemory",
+            "direction": "forward",
+            "events": [
+              {
+                "schemaVersion": "agent-activity/v1",
+                "eventId": "agmemory-http-8",
+                "journalEpoch": "http-example-epoch",
+                "sequence": "8",
+                "occurredAt": "2026-10-21T12:00:00Z",
+                "recordedAt": "2026-10-21T12:00:00Z",
+                "application": "agmemory",
+                "source": "mcp",
+                "clientKind": "codex",
+                "sessionId": "example-session",
+                "agentId": null,
+                "identityQuality": "process",
+                "operationId": "operation-8",
+                "operation": "search",
+                "phase": "finished",
+                "outcome": "succeeded",
+                "durationMs": 4.5,
+                "resultCount": 1,
+                "query": {
+                  "mode": "preview",
+                  "preview": "alpha beta",
+                  "truncated": false
+                },
+                "target": {
+                  "kind": "memory",
+                  "nodeKey": "example-opaque-node",
+                  "generation": "example-generation",
+                  "status": "available"
+                },
+                "request": {
+                  "tool": "memory_recall",
+                  "summary": "Найти сведения о настройках журналирования; limit=3"
+                },
+                "response": {
+                  "summary": "Найдена 1 запись; тип Outcome",
+                  "resultCount": 1,
+                  "items": [
+                    {
+                      "label": "Outcome"
+                    }
+                  ],
+                  "truncated": false
+                }
+              }
+            ],
+            "nextCursor": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            },
+            "highWatermark": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            },
+            "oldestSequence": "3",
+            "hasMore": false,
+            "truncated": false,
+            "health": {
+              "status": "ok",
+              "droppedTotal": 0,
+              "queueItems": null,
+              "queueBytes": null,
+              "errorCode": null
+            }
+          }
+        },
+        {
+          "query": "afterSequence=2&journalEpoch=http-example-epoch&q=unmatched",
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "agmemory",
+            "direction": "forward",
+            "events": [],
+            "nextCursor": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            },
+            "highWatermark": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            },
+            "oldestSequence": "3",
+            "hasMore": false,
+            "truncated": false,
+            "health": {
+              "status": "ok",
+              "droppedTotal": 0,
+              "queueItems": null,
+              "queueBytes": null,
+              "errorCode": null
+            }
+          }
+        }
+      ],
+      "errors": [
+        {
+          "statusCode": 400,
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "agmemory",
+            "error": {
+              "code": "invalid_query",
+              "message": "Invalid query parameters.",
+              "retryable": false
+            },
+            "resetCursor": null
+          }
+        },
+        {
+          "statusCode": 403,
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "agmemory",
+            "error": {
+              "code": "forbidden",
+              "message": "Access forbidden.",
+              "retryable": false
+            },
+            "resetCursor": null
+          }
+        },
+        {
+          "statusCode": 409,
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "agmemory",
+            "error": {
+              "code": "cursor_expired",
+              "message": "Cursor has expired.",
+              "retryable": false
+            },
+            "resetCursor": {
+              "journalEpoch": "http-example-epoch",
+              "sequence": "10"
+            }
+          }
+        },
+        {
+          "statusCode": 503,
+          "response": {
+            "schemaVersion": "agent-activity-http/v1",
+            "application": "agmemory",
+            "error": {
+              "code": "journal_unavailable",
+              "message": "Journal is unavailable.",
+              "retryable": true
+            },
+            "resetCursor": null
+          }
+        }
+      ]
+    }
+  ],
+  "validation": {
+    "invalidQueries": [
+      "limit=0",
+      "limit=101",
+      "limit=01",
+      "afterSequence=2",
+      "journalEpoch=epoch",
+      "afterSequence=2&beforeSequence=5&journalEpoch=epoch",
+      "limit=2&limit=3",
+      "actorId=ignored",
+      "afterSequence=9223372036854775808&journalEpoch=epoch",
+      "q=%GG",
+      "q=%",
+      "q=%80",
+      "limit=1&%6cimit=2"
+    ],
+    "validQueries": [
+      "",
+      "limit=1",
+      "limit=100",
+      "afterSequence=2&journalEpoch=epoch",
+      "beforeSequence=5&journalEpoch=epoch"
+    ]
+  }
+}

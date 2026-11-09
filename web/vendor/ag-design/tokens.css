@@ -1,0 +1,49 @@
+/* AG geometry is shared. Host applications supply their own semantic colours. */
+:root {
+  --ag-font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ag-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --ag-space-1: 4px;
+  --ag-space-2: 8px;
+  --ag-space-3: 12px;
+  --ag-space-4: 16px;
+  --ag-space-6: 24px;
+  --ag-space-8: 32px;
+  --ag-control-height: 32px;
+  --ag-icon-size: 20px;
+  --ag-radius-control: 7px;
+  --ag-radius-panel: 12px;
+  --ag-rail-width: 52px;
+  --ag-sidebar-width: 220px;
+  --ag-text-size: 13px;
+  --ag-label-size: 12px;
+  --ag-layer-toolbar: 10;
+  --ag-layer-popup: 40;
+  --ag-layer-dialog: 60;
+  --ag-accent: #0068d4;
+  --ag-on-accent: #fff;
+  --ag-surface: #fafafc;
+  --ag-surface-alt: #f1f1f5;
+  --ag-text: #23252c;
+  --ag-muted: #626571;
+  --ag-border: #8f9199;
+  --ag-danger: #b5312c;
+  --ag-success: #227244;
+}
+@media (pointer: coarse) {
+  :root {
+    --ag-control-height: 44px;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ag-accent: #65acff;
+    --ag-on-accent: #071b30;
+    --ag-surface: #202126;
+    --ag-surface-alt: #292a31;
+    --ag-text: #e9eaf0;
+    --ag-muted: #a8abb6;
+    --ag-border: #686b76;
+    --ag-danger: #ff8d83;
+    --ag-success: #79cf99;
+  }
+}

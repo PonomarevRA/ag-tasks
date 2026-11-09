@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ag-tasks"
+version = "0.8.2"
+description = "Independent local issue tracker with human-reviewed git worktrees"
+requires-python = ">=3.11"
+dependencies = ["fastapi>=0.118,<1", "uvicorn>=0.35,<1", "httpx>=0.28,<1", "mcp>=1,<2", "markdown-it-py>=4,<5"]
+
+[project.optional-dependencies]
+test = ["pytest>=9,<10"]
+desktop = ["qtpy>=2,<3; sys_platform == 'linux'", "PyQt6>=6.7,<7; sys_platform == 'linux'", "PyQt6-WebEngine>=6.7,<7; sys_platform == 'linux'", "psutil>=6,<8", "pywebview>=6,<7", "pyinstaller>=6,<7"]
+
+[project.scripts]
+ag-tasks = "ag_tasks.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["ag_tasks*", "desktop_support*", "service_telemetry*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

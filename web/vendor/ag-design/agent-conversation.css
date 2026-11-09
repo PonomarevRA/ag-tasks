@@ -1,0 +1,503 @@
+/* Conversation geometry is independent of consumer palettes; all colours use the host's semantic tokens. */
+.ag-conversation {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  max-height: var(--ag-conversation-max-height, none);
+  color: var(--ag-text);
+  background: var(--ag-surface);
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius, 12px);
+  font: inherit;
+  overflow: hidden;
+}
+.ag-conversation [hidden] {
+  display: none !important;
+}
+.ag-conversation__header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ag-border);
+}
+.ag-conversation__header h2 {
+  font-size: 1rem;
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+}
+.ag-conversation__header p {
+  margin: 0;
+  font-size: 0.85rem;
+}
+.ag-conversation__viewport {
+  min-height: 120px;
+  overflow: auto;
+  padding: 8px 16px 16px;
+  overscroll-behavior: contain;
+  overflow-anchor: none;
+}
+.ag-conversation__message {
+  position: relative;
+  margin: 24px 0;
+  min-width: 0;
+  padding: 12px 0;
+}
+.ag-conversation__message[data-role="user"] {
+  margin: 12px 0 28px;
+  padding: 12px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--ag-surface-alt, var(--ag-surface));
+}
+.ag-conversation__message h3 {
+  font-size: 1rem;
+  margin: 0 0 14px;
+  color: var(--ag-text);
+  overflow-wrap: anywhere;
+}
+.ag-conversation__message[data-role="agent"] > h3::before {
+  content: "";
+  display: inline-block;
+  width: 0.7em;
+  height: 0.7em;
+  margin-inline-end: 0.6em;
+  border: 2px solid var(--ag-accent);
+  border-radius: 50%;
+}
+.ag-conversation__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.ag-conversation__text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.55;
+}
+.ag-conversation__block {
+  margin: 8px 0;
+  min-width: 0;
+}
+.ag-conversation__block summary,
+.ag-conversation__group > summary {
+  cursor: pointer;
+  padding: 4px;
+  min-height: 28px;
+  line-height: 1.5;
+  color: var(--ag-muted);
+  overflow-wrap: anywhere;
+}
+.ag-conversation__block summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+}
+.ag-conversation__block summary::-webkit-details-marker {
+  display: none;
+}
+.ag-conversation__block summary::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  margin: 0 4px 0 auto;
+}
+.ag-conversation__block[open] > summary::after {
+  transform: rotate(45deg);
+}
+.ag-conversation__block-summary > strong {
+  font-weight: 400;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ag-conversation__block summary:is(:hover, :focus-visible) {
+  background: var(--ag-surface-alt, var(--ag-surface));
+  color: var(--ag-text);
+}
+.ag-conversation__operation-icon {
+  display: inline-flex;
+  flex: 0 0 20px;
+}
+.ag-conversation__operation-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ag-conversation__block-status {
+  flex: 0 1 auto;
+  color: var(--ag-muted);
+  font-size: 0.85rem;
+}
+.ag-conversation__block[data-status="completed"]
+  > summary
+  > .ag-conversation__block-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.ag-conversation__block[data-status="completed"]
+  > summary
+  > .ag-conversation__operation-icon::after {
+  content: "✓";
+  font-size: 0.65rem;
+  align-self: flex-end;
+  margin-left: -5px;
+}
+.ag-conversation__block[data-status="failed"] > summary {
+  border-left: 3px solid var(--ag-danger);
+}
+.ag-conversation__block-body {
+  padding: 4px 0 8px 4px;
+  min-width: 0;
+}
+.ag-conversation__block[data-kind="text"] .ag-conversation__block-body,
+.ag-conversation__block[data-kind="markdown"] .ag-conversation__block-body {
+  padding: 0;
+}
+.ag-conversation__block pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
+  max-height: 360px;
+  overflow: auto;
+  margin: 0;
+  padding: 12px;
+  background: var(--ag-surface-alt, var(--ag-surface));
+  border: 0;
+}
+.ag-conversation__code {
+  min-width: 0;
+  margin: 8px 0;
+  border: 1px solid var(--ag-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.ag-conversation__code[data-field="output"] {
+  border-inline-start: 3px solid var(--ag-border);
+}
+.ag-conversation__code[data-field="output"] pre {
+  background: var(--ag-surface);
+}
+.ag-conversation__code[data-wrapped="false"] pre {
+  white-space: pre;
+  overflow-wrap: normal;
+}
+.ag-conversation__code[data-expanded="true"] pre {
+  max-height: 60dvh;
+}
+.ag-conversation__code-tools {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--ag-surface-alt, var(--ag-surface));
+}
+.ag-conversation__code-button {
+  color: var(--ag-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 4px 6px;
+  min-height: 28px;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.ag-conversation__code-button:is(:hover, [aria-pressed="false"]) {
+  border-color: var(--ag-border);
+  color: var(--ag-text);
+}
+.ag-conversation__group {
+  padding-left: 8px;
+  border-left: 2px solid var(--ag-border);
+}
+.ag-conversation__group[open] {
+  margin: 8px 0;
+}
+.ag-conversation__group > summary {
+  font-size: 0.9rem;
+}
+@media (max-width: 480px) {
+  .ag-conversation__viewport {
+    padding-inline: 12px;
+  }
+  .ag-conversation__block-summary {
+    flex-wrap: wrap;
+  }
+  .ag-conversation__block-summary > strong {
+    flex: 1 1 60%;
+  }
+}
+.ag-conversation__muted,
+.ag-conversation__notice,
+.ag-conversation__empty {
+  color: var(--ag-muted);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.ag-conversation__notice {
+  margin: 0;
+  padding: 8px 16px;
+  min-height: 1.2em;
+}
+.ag-conversation__footer,
+.ag-conversation__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ag-conversation__footer {
+  border-top: 1px solid var(--ag-border);
+  padding: 8px 12px;
+}
+.ag-conversation .ag-button {
+  min-height: 32px;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.ag-conversation__composer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--ag-border);
+  padding: 12px;
+}
+.ag-conversation__composer label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ag-conversation__composer textarea {
+  box-sizing: border-box;
+  width: 100%;
+  resize: vertical;
+  min-height: 72px;
+  max-height: 240px;
+  background: var(--ag-surface);
+  color: var(--ag-text);
+  border: 1px solid var(--ag-border);
+  border-radius: 6px;
+  padding: 8px;
+  font: inherit;
+}
+.ag-conversation__composer button {
+  align-self: flex-end;
+}
+/* Compact composer is opt-in. Supporting engines grow to content; other engines retain manual vertical resize. */
+.ag-conversation__composer--compact textarea {
+  min-height: max(var(--ag-control-height, 32px), calc(1.5em + 18px));
+  max-height: max(12em, calc(1.5em + 18px));
+  field-sizing: content;
+  line-height: 1.5;
+}
+.ag-conversation__composer-bar,
+.ag-conversation__composer-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ag-space-2, 8px);
+  min-width: 0;
+}
+.ag-conversation__composer-bar {
+  justify-content: space-between;
+}
+.ag-conversation__composer-tools {
+  flex: 1 1 auto;
+}
+.ag-conversation__composer-bar .ag-button {
+  max-width: 100%;
+  min-width: 0;
+  min-height: max(var(--ag-control-height, 32px), calc(1.5em + 14px));
+  overflow-wrap: anywhere;
+}
+.ag-conversation :is(button, summary, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: 2px;
+}
+.ag-agent-chat__conversation {
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+}
+.ag-agent-chat__conversation .ag-conversation {
+  max-height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+.ag-agent-chat__view-choice {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 8px;
+}
+
+.ag-agent-chat__panel[data-view="conversation"] {
+  height: min(560px, calc(100dvh - 48px));
+  width: min(400px, calc(100vw - 32px));
+}
+.ag-conversation__text p {
+  margin: 0 0 8px;
+}
+
+/* Large text may grow the surrounding page; fixed controls must never overlap or clip the composer. */
+.ag-conversation__header,
+.ag-conversation__notice,
+.ag-conversation__footer,
+.ag-conversation__composer {
+  flex-shrink: 0;
+}
+.ag-conversation__viewport {
+  height: var(--ag-conversation-log-height, min(420px, 50dvh));
+  flex: 1 1 auto;
+}
+.ag-conversation__notice:empty {
+  display: none;
+}
+.ag-conversation .ag-button {
+  font: inherit;
+  line-height: 1.3;
+}
+.ag-agent-chat__conversation {
+  overflow: auto;
+}
+.ag-agent-chat__conversation > .ag-conversation {
+  max-height: none;
+  flex: 0 0 auto;
+}
+.ag-conversation-demo__layout {
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+}
+.ag-conversation-demo__navigation {
+  flex: 0 0 auto;
+  max-width: 48px;
+}
+.ag-conversation-demo__layout > .ag-conversation {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Document: narrative uses a readable shared track, without nesting every answer in another surface. */
+.ag-conversation[data-presentation="document"] .ag-conversation__message {
+  max-inline-size: 75ch;
+  margin-inline: auto;
+}
+/* Messenger: position and surfaces identify speakers while author headings remain semantic. */
+.ag-conversation[data-presentation="messenger"] .ag-conversation__message {
+  inline-size: fit-content;
+  max-inline-size: min(92%, 64ch);
+  margin-block: 12px;
+  padding: 12px 16px;
+  border-radius: var(--ag-radius, 12px);
+}
+.ag-conversation[data-presentation="messenger"]
+  .ag-conversation__message[data-role="agent"] {
+  margin-inline: 0 auto;
+  background: var(--ag-surface-alt, var(--ag-surface));
+}
+.ag-conversation[data-presentation="messenger"]
+  .ag-conversation__message[data-role="user"] {
+  margin-inline: auto 0;
+  background: var(--ag-surface-alt, var(--ag-surface));
+  border-inline-start: 3px solid var(--ag-accent);
+}
+.ag-conversation[data-presentation="messenger"]
+  .ag-conversation__message[data-role="system"] {
+  margin-inline: auto;
+}
+.ag-conversation[data-presentation="messenger"] .ag-conversation__message > h3 {
+  font-size: 0.85em;
+  margin-block-end: 8px;
+}
+.ag-conversation[data-presentation="messenger"]
+  .ag-conversation__message
+  > h3::before {
+  display: none;
+}
+/* Work log: chronology and explicit status replace bubbles; prose keeps a human-readable font. */
+.ag-conversation[data-presentation="work-log"] .ag-conversation__message {
+  margin-block: 0;
+  padding: 12px 0 16px 16px;
+  padding-inline: 16px 0;
+  border-inline-start: 1px solid var(--ag-border);
+  border-radius: 0;
+  background: transparent;
+}
+.ag-conversation[data-presentation="work-log"] .ag-conversation__message > h3 {
+  font-size: 0.85em;
+  margin-block-end: 6px;
+  color: var(--ag-muted);
+}
+.ag-conversation[data-presentation="work-log"]
+  .ag-conversation__message
+  > h3::before {
+  display: none;
+}
+.ag-conversation[data-presentation="work-log"]
+  .ag-conversation__message::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: -3px;
+  inset-block-start: 1.2em;
+  inline-size: 5px;
+  block-size: 5px;
+  background: var(--ag-text);
+  border-radius: 50%;
+}
+.ag-conversation[data-presentation="work-log"] .ag-conversation__block summary {
+  border-radius: 0;
+}
+.ag-conversation[data-presentation="work-log"]
+  .ag-conversation__block[data-status="completed"]
+  > summary
+  > .ag-conversation__block-status {
+  position: static;
+  inline-size: auto;
+  block-size: auto;
+  clip-path: none;
+  overflow: visible;
+}
+.ag-conversation[data-presentation="work-log"]
+  .ag-conversation__block[data-status="completed"]
+  > summary
+  > .ag-conversation__operation-icon::after {
+  display: none;
+}
+.ag-conversation[data-presentation="work-log"] .ag-conversation__group {
+  border: 0;
+  padding-inline-start: 0;
+}
+.ag-conversation[data-presentation] .ag-conversation__message-body {
+  min-inline-size: 0;
+}
+.ag-conversation[data-presentation]
+  .ag-conversation__block[data-status="failed"]
+  > summary {
+  border-left: 0;
+  border-inline-start: 3px solid var(--ag-danger);
+}

@@ -1,0 +1,115 @@
+.ag-markdown-editor {
+  /* Inline containment has no intrinsic width; fill the allocated host content box. */
+  inline-size: 100%;
+  box-sizing: border-box;
+  container-type: inline-size;
+  container-name: ag-markdown-editor;
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+  color: var(--ag-text);
+  background: var(--ag-surface);
+  font: inherit;
+}
+.ag-markdown-editor[hidden],
+.ag-markdown-editor [hidden] {
+  display: none !important;
+}
+.ag-markdown-editor__toolbar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.ag-markdown-editor__toolbar button {
+  color: var(--ag-text);
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  padding: 6px 10px;
+  font: inherit;
+  cursor: pointer;
+}
+.ag-markdown-editor__toolbar button[aria-pressed="true"] {
+  background: var(--ag-surface-alt);
+  font-weight: 600;
+}
+.ag-markdown-editor__toolbar button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.ag-markdown-editor :focus-visible {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: 2px;
+}
+.ag-markdown-editor__panes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  min-width: 0;
+}
+.ag-markdown-editor[data-mode="edit"] .ag-markdown-editor__panes,
+.ag-markdown-editor[data-mode="preview"] .ag-markdown-editor__panes {
+  grid-template-columns: minmax(0, 1fr);
+}
+.ag-markdown-editor__panes > .ag-markdown-viewer {
+  max-height: var(--ag-md-editor-height, 360px);
+  overflow: auto;
+}
+.ag-markdown-editor__status:empty,
+.ag-markdown-editor__preview-status:empty {
+  display: none;
+}
+.ag-markdown-editor__status,
+.ag-markdown-editor__preview-status {
+  padding-inline-start: 8px;
+  border-inline-start: 3px solid var(--ag-border);
+}
+.ag-markdown-editor[data-preview-error="true"]
+  .ag-markdown-editor__preview-status,
+.ag-markdown-editor__preview-status {
+  border-inline-start-color: var(--ag-danger, var(--ag-accent));
+}
+@media (max-width: 680px) {
+  .ag-markdown-editor__panes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container ag-markdown-editor (max-width: 680px) {
+  .ag-markdown-editor__panes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.ag-markdown-editor__file-choice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--ag-border);
+  border-radius: 6px;
+}
+.ag-markdown-editor__file-choice button {
+  font: inherit;
+  color: var(--ag-text);
+  background: var(--ag-surface-alt);
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.ag-markdown-editor__toolbar button,
+.ag-markdown-editor__file-choice button {
+  min-block-size: var(--ag-control-height, 32px);
+  min-inline-size: var(--ag-control-height, 32px);
+}
+@media (pointer: coarse) {
+  .ag-markdown-editor__toolbar button,
+  .ag-markdown-editor__file-choice button {
+    min-block-size: 44px;
+    min-inline-size: 44px;
+  }
+}

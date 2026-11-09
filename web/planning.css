@@ -1,0 +1,37 @@
+/* Identity colours are secondary cues; titles, prefixes and semantic text retain the host palette/contrast. */
+.named-identity{border-inline-start:3px solid var(--identity-color)!important}
+.space-breadcrumb.named-identity{padding-inline-start:9px}
+.space-list .named-identity{padding-inline-start:12px}
+.document-chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.document-chip.ag-button{border-radius:999px;padding:5px 12px;max-width:100%;overflow-wrap:anywhere;white-space:normal;font-size:12px;min-height:30px}
+.document-editor{display:grid;gap:10px;padding-block:12px}
+.document-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.document-dialog.ag-popup{width:min(900px,calc(100vw - 36px));max-width:none;max-height:calc(100dvh - 36px);padding:20px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:14px}
+.document-dialog.document-expanded[open]{width:calc(100vw - 24px);height:calc(100dvh - 24px);max-height:none;display:flex;flex-direction:column}
+.document-content{min-width:0;overflow:auto}
+.markdown-body{font-size:14px;line-height:1.7;overflow-wrap:anywhere;max-width:80ch;margin:24px auto}
+.markdown-body h1,.markdown-body h2,.markdown-body h3{line-height:1.3;margin:1.5em 0 .7em;overflow-wrap:anywhere}
+.markdown-body h1{font-size:1.8em}.markdown-body h2{font-size:1.45em}.markdown-body h3{font-size:1.2em}
+.markdown-body p{margin:.8em 0}.markdown-body ul,.markdown-body ol{padding-inline-start:1.8em}
+.markdown-body code,.markdown-source{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+.markdown-body :not(pre)>code{background:var(--subtle);padding:2px 5px;border:1px solid var(--line);border-radius:5px}
+.markdown-body pre{position:relative;background:var(--subtle);border:1px solid var(--line);padding:16px 16px 48px;border-radius:9px;overflow:auto;line-height:1.6}
+.markdown-body .copy-code{position:absolute;inset:auto 8px 8px auto;font:inherit;font-size:11px}
+.markdown-body blockquote{margin-inline:0;padding-inline:16px;border-inline-start:3px solid var(--blue);color:var(--muted)}
+.markdown-table{max-width:100%;overflow:auto}.markdown-body table{border-collapse:collapse;min-width:100%}
+.markdown-body th,.markdown-body td{padding:8px 12px;border:1px solid var(--line);text-align:start}
+.markdown-body th{background:var(--subtle)}.markdown-body a{color:var(--blue);text-decoration:underline}
+.markdown-source{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;padding:16px;background:var(--subtle);border-radius:8px}
+.complexity-comparison{display:grid;grid-template-columns:1fr 1fr;gap:16px}.complexity-cell{border:1px solid var(--line);border-radius:9px;padding:12px}
+.complexity-cell>strong{display:block;font-size:18px;margin-block:6px}.complexity-cell p{font-size:12px}
+.planning-section details>*:not(summary),.problems-section details>*:not(summary){margin-block:8px}
+.task-problem{border:1px solid var(--line);border-radius:9px;padding:14px;margin-block:12px}.task-problem h4{margin:8px 0}
+.cross-space-key{max-width:170px}.document-dialog [hidden],.document-content [hidden]{display:none!important}
+@media(max-width:650px){.complexity-comparison{grid-template-columns:1fr}.document-dialog.ag-popup{padding:12px}.document-toolbar{gap:6px}}
+
+.space-management-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+
+/* Literal metadata wraps within task cards and remains readable at narrow widths. */
+.task-labels {display:flex;flex-wrap:wrap;gap:6px;max-width:100%;margin-block:8px;}
+.task-labels > * {white-space:normal;overflow-wrap:anywhere;max-width:100%;}
+.review-history {margin-block-start:12px;}

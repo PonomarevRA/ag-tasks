@@ -1,0 +1,36 @@
+/* Intensity is supplementary: semantic foreground/surface remain readable without color mixing. */
+.ag-numeric-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.25em 0.55em;
+  border: 1px solid var(--ag-border);
+  border-radius: 999px;
+  color: var(--ag-text);
+  background: var(--ag-surface);
+  font: 500 max(0.75rem, 12px)/1.4 var(--ag-font, system-ui, sans-serif);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.ag-numeric-badge__dot {
+  width: 0.45em;
+  height: 0.45em;
+  flex: none;
+  border-radius: 50%;
+  background: var(--ag-muted);
+}
+@supports (color: color-mix(in srgb, red, blue)) {
+  .ag-numeric-badge[data-scaled="true"] {
+    border-color: color-mix(in srgb, var(--ag-accent) var(--ag-numeric-intensity), var(--ag-border));
+  }
+  .ag-numeric-badge[data-scaled="true"] .ag-numeric-badge__dot {
+    background: color-mix(in srgb, var(--ag-accent) var(--ag-numeric-intensity), var(--ag-muted));
+  }
+}
+.ag-numeric-badge[hidden] { display: none; }
+@media (forced-colors: active) {
+  .ag-numeric-badge { border-color: CanvasText; color: CanvasText; background: Canvas; }
+  .ag-numeric-badge__dot { background: CanvasText; }
+}

@@ -1,0 +1,172 @@
+/* Keep feedback outside the primary control tracks; never bottom-align whole status-bearing blocks. */
+.ag-catalog-search {
+  min-width: 0;
+  max-width: 100%;
+  color: var(--ag-text);
+  overflow-wrap: anywhere;
+  container-type: inline-size;
+}
+.ag-catalog-search__form {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.ag-catalog-search__primary {
+  display: grid;
+  grid-template-columns: var(--ag-search-columns, minmax(0, 1fr) auto);
+  grid-template-rows: auto auto;
+  gap: 6px 12px;
+  min-width: 0;
+}
+.ag-catalog-search__query,
+.ag-catalog-search__adjacent {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: 1 / span 2;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.ag-catalog-search__query {
+  grid-column: 1;
+}
+.ag-catalog-search__adjacent {
+  grid-column: var(--ag-search-column);
+}
+.ag-catalog-search__query > span,
+.ag-catalog-search__adjacent > span {
+  font: inherit;
+  font-weight: 500;
+  align-self: end;
+}
+.ag-catalog-search__actions {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+}
+.ag-catalog-search .ag-catalog-search__query > input,
+.ag-catalog-search .ag-catalog-search__adjacent > :is(input, select, textarea),
+.ag-catalog-search__facet > select {
+  font: inherit;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  color: var(--ag-text);
+  background: var(--ag-surface);
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius-control, 7px);
+}
+.ag-catalog-search__actions > .ag-button {
+  min-height: 40px;
+  height: 100%;
+  align-self: stretch;
+}
+.ag-catalog-search__facets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-width: 0;
+}
+.ag-catalog-search__facet {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 14px;
+  line-height: 1.5;
+}
+fieldset.ag-catalog-search__facet {
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius, 7px);
+  padding: 8px 12px;
+}
+.ag-catalog-search__facet label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+}
+.ag-catalog-search__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-block: 8px;
+  min-width: 0;
+}
+.ag-catalog-search .ag-button {
+  white-space: normal;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.ag-catalog-search__status,
+.ag-catalog-search__dirty {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ag-muted);
+  margin-block: 6px;
+}
+.ag-catalog-search__status:empty,
+.ag-catalog-search__dirty:empty {
+  display: none;
+}
+.ag-catalog-search[data-status="error"] .ag-catalog-search__status {
+  color: var(--ag-danger);
+}
+.ag-catalog-search :is(button, input, select):focus-visible {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: 3px;
+}
+.ag-catalog-search [hidden] {
+  display: none !important;
+}
+@container (max-width:48rem) {
+  .ag-catalog-search__primary {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-auto-rows: auto;
+  }
+  .ag-catalog-search__adjacent {
+    grid-column: 1 / -1;
+    grid-row: auto / span 2;
+  }
+}
+
+@container (max-width:64rem) {
+  .ag-catalog-search__primary[data-adjacent-count="2"] {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .ag-catalog-search__primary[data-adjacent-count="2"]
+    > .ag-catalog-search__adjacent {
+    grid-column: 1 / -1;
+    grid-row: auto / span 2;
+  }
+}
+
+@container (max-width:76rem) {
+  .ag-catalog-search__primary[data-adjacent-count="3"] {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .ag-catalog-search__primary[data-adjacent-count="3"]
+    > .ag-catalog-search__adjacent {
+    grid-column: 1 / -1;
+    grid-row: auto / span 2;
+  }
+}
+
+@container (max-width:88rem) {
+  .ag-catalog-search__primary[data-adjacent-count="4"] {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .ag-catalog-search__primary[data-adjacent-count="4"]
+    > .ag-catalog-search__adjacent {
+    grid-column: 1 / -1;
+    grid-row: auto / span 2;
+  }
+}

@@ -1,0 +1,123 @@
+.work-filters,.work-kpis,.work-breakdowns {
+  display:grid;
+  gap:.8rem;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,10rem),1fr));
+}
+.work-filters {--ag-form-track-gap:.5rem;align-items:stretch}
+.work-filters label {margin:0}
+
+.work-filters button {justify-self:start}
+.work-status:empty {display:none}
+.work-results {display:grid;gap:1rem;margin-top:1rem}
+.work-kpis {margin:0}
+.work-kpis>div,.work-panel {
+  padding:1rem;
+  background:var(--ag-surface);
+  border:1px solid var(--ag-border);
+  border-radius:.7rem;
+  min-width:0;
+}
+.work-kpis dt {color:var(--ag-muted)}
+.work-kpis dd {margin:.3rem 0 0;font-size:1.45rem;font-weight:650}
+.work-panel h2 {margin-bottom:.75rem}
+.work-panel>svg {display:block;width:100%;height:9rem;fill:var(--ag-accent);border-bottom:1px solid var(--ag-border)}
+.work-panel details {margin-top:.6rem}
+.work-axis {display:flex;justify-content:space-between;gap:.5rem;overflow-wrap:anywhere}
+.work-axis span:last-child {flex-shrink:0}
+.work-values {display:grid;grid-template-columns:1fr 1fr;gap:.25rem}
+.work-values dd {margin:0}
+.work-breakdowns {grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr))}
+.work-groups {display:grid;gap:.7rem;padding:0;margin:0;list-style:none}
+.work-groups meter {width:100%;height:.6rem}
+.work-groups meter::-webkit-meter-optimum-value {background:var(--ag-accent)}
+.work-table {overflow-x:auto}
+.work-table table {width:100%;border-collapse:collapse}
+.work-table th,.work-table td {padding:.45rem;text-align:start;border-bottom:1px solid var(--ag-border)}
+.work-table td:nth-child(4) {min-width:6rem;font-variant-numeric:tabular-nums}
+.work-table th button {text-align:start;white-space:normal;overflow-wrap:anywhere}
+.work-pager {display:flex;align-items:center;flex-wrap:wrap;gap:.7rem}
+
+.work-percentiles p {margin:.55rem 0;color:var(--ag-muted)}
+.work-percentiles p:last-child {margin-bottom:0}
+
+.work-chart p {color:var(--ag-muted);margin:.6rem 0}
+.work-chart-controls {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,11rem),1fr));gap:1rem;align-items:end;margin:1.25rem 0}
+.work-chart-controls label {margin:0}
+
+.work-chart-host {overflow-x:auto;min-width:0}
+.work-chart-host .ag-vt-chart__plot {min-width:580px}
+.work-chart-host .ag-vt-chart__data {overflow-x:auto}
+.work-chart-samples {margin-top:1rem}
+.work-chart .ag-vt-chart h3 {font-size:.95rem;color:var(--ag-muted)}
+.work-chart .ag-vt-chart__legend {margin-top:.75rem}
+.work-chart .ag-vt-chart__footer {flex-wrap:wrap}
+
+.work-chart [hidden] {display:none!important}
+.work-chart .ag-vt-chart__footer {font-size:.9rem;gap:.5rem}
+
+.work-chart-samples {overflow-x:auto}
+.work-chart-samples table {width:100%;border-collapse:collapse}
+.work-chart-samples th,.work-chart-samples td {padding:.5rem;text-align:start;border-bottom:1px solid var(--ag-border)}
+.work-chart-host .ag-vt-chart__plot {max-width:800px;margin-inline:auto}
+
+/* AG shared tracks reserve separate caption, control and feedback slots. */
+.work-chart-controls {--ag-form-track-gap:.5rem}
+:is(.work-filters,.work-chart-controls) :is(input,select,button) {
+  box-sizing:border-box;
+  block-size:2.75rem;
+  min-block-size:2.75rem;
+  max-inline-size:100%;
+  font:inherit;
+  line-height:1.25;
+  padding-block:.5rem;
+}
+:is(.work-filters,.work-chart-controls) input {padding-inline:.75rem}
+.work-filters .work-filter-action {min-inline-size:0}
+@supports not (grid-template-rows:subgrid) {
+  :is(.work-filters,.work-chart-controls)>[data-ag-form-field] {
+    display:grid;grid-template-rows:1fr auto;align-self:stretch;
+  }
+}
+:is(.work-filters,.work-chart-controls) .task-field-label {font:inherit;line-height:1.4}
+:is(.work-filters,.work-chart-controls)>[data-ag-form-field] {row-gap:inherit;font:inherit}
+
+/* Execution snapshots and event charts own independent panels under the shared report filters. */
+.execution-dashboard {container-type:inline-size;display:grid;gap:1rem;min-inline-size:0}
+.execution-dashboard>h2 {margin:0}
+.execution-scope {margin:0;color:var(--ag-muted);line-height:1.5}
+.execution-chart-grid {display:grid;grid-template-columns:minmax(0,1fr);gap:1rem;align-items:start}
+.execution-chart h3 {margin:0 0 1rem}
+.execution-chart .work-chart-host {margin-block:1rem}
+.execution-chart [hidden],.work-results [hidden] {display:none!important}
+.execution-attention-list {margin:0;padding:0;list-style:none}
+.execution-attention-list li {padding:.8rem 0;border-top:1px solid var(--ag-border)}
+.execution-attention-list button {text-align:start;white-space:normal;overflow-wrap:anywhere}
+.execution-attention-list p {margin:.4rem 0;color:var(--ag-muted)}
+.execution-attention-list time {font-size:.9rem;color:var(--ag-muted)}
+.dashboard-help {flex-wrap:wrap}
+.work-refresh-bar {display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;margin-block:1rem}
+.work-auto-refresh {display:inline-flex;align-items:center;gap:.5rem;margin:0}
+.work-auto-refresh input {width:auto;min-width:0}
+.work-refresh-state {color:var(--ag-muted)}
+@container (min-width:1240px) {
+  .execution-chart-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+.work-time-summary {display:grid;gap:1rem;min-inline-size:0}
+.work-time-summary>h2 {margin:0}
+.execution-attention-list li {display:grid;grid-template-columns:minmax(0,1fr) minmax(12rem,.8fr);gap:.4rem 1rem;align-items:start}
+.execution-attention-list p {margin:0}
+.execution-attention-list time {grid-column:1/-1}
+@media(max-width:600px) {
+  .execution-attention-list li {grid-template-columns:minmax(0,1fr)}
+}
+
+.dashboard-block {position:relative;min-inline-size:0}
+.dashboard-block>summary {cursor:pointer;min-height:2.5rem;padding:.3rem 3rem .3rem 0;font-size:1.05rem;font-weight:600;line-height:1.5;overflow-wrap:anywhere}
+.dashboard-block>summary::marker {color:var(--ag-muted)}
+.dashboard-block>summary:focus-visible {outline:2px solid var(--ag-accent);outline-offset:2px;border-radius:.3rem}
+.dashboard-block-body {min-inline-size:0;padding-block-start:.75rem}
+.dashboard-block-info {position:absolute;inset-block-start:0;inset-inline-end:0;margin:0;z-index:1}
+.dashboard-block-help .ag-inline-help__label {display:none}
+.dashboard-filter-block {padding:.7rem 1rem;background:var(--ag-surface);border:1px solid var(--ag-border);border-radius:.7rem}
+.dashboard-block:not([open])>.dashboard-block-body {display:none}

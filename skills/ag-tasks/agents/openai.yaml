@@ -1,0 +1,7 @@
+interface:
+  display_name: "Ag Tasks"
+  short_description: "Планы изменений в Tasks, роли, ревью и результаты"
+  default_prompt: "Use $ag-tasks to find or create the RnD change plan in Tasks, then follow the requested planning or implementation stage."
+
+policy:
+  allow_implicit_invocation: true

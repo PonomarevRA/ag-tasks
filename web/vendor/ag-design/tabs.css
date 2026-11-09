@@ -1,0 +1,94 @@
+.ag-tabs {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  color: var(--ag-text);
+  font: inherit;
+}
+.ag-tabs__list {
+  display: flex;
+  gap: 4px;
+  align-items: stretch;
+  max-width: 100%;
+  overflow: auto;
+  border-block-end: 1px solid var(--ag-border);
+}
+.ag-tabs__tab {
+  box-sizing: border-box;
+  flex: none;
+  min-height: var(--ag-control-height, 32px);
+  padding: 6px 12px;
+  border: 0;
+  border-block-end: 2px solid transparent;
+  border-radius: 5px 5px 0 0;
+  background: transparent;
+  color: var(--ag-muted);
+  font: inherit;
+  font-weight: 600;
+  white-space: normal;
+  cursor: pointer;
+}
+.ag-tabs__tab[aria-selected="true"] {
+  color: var(--ag-text);
+  border-block-end-color: var(--ag-accent);
+  background: var(--ag-surface-alt);
+}
+.ag-tabs__tab:disabled {
+  color: var(--ag-muted);
+  cursor: not-allowed;
+}
+.ag-tabs__tab:focus-visible {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: -2px;
+}
+.ag-tabs__panels,
+.ag-tabs__panel {
+  min-width: 0;
+}
+.ag-tabs__panel[hidden] {
+  display: none !important;
+}
+.ag-tabs__panel:focus-visible {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: 2px;
+}
+.ag-tabs[data-orientation="vertical"] {
+  grid-template-columns: minmax(130px, 210px) minmax(0, 1fr);
+}
+.ag-tabs[data-orientation="vertical"] > .ag-tabs__list {
+  flex-direction: column;
+  border-block-end: 0;
+  border-inline-end: 1px solid var(--ag-border);
+  overflow: auto;
+  align-items: stretch;
+}
+.ag-tabs[data-orientation="vertical"] > .ag-tabs__list > .ag-tabs__tab {
+  text-align: start;
+  border: 0;
+  border-inline-start: 2px solid transparent;
+  border-radius: 5px;
+}
+.ag-tabs[data-orientation="vertical"]
+  > .ag-tabs__list
+  > .ag-tabs__tab[aria-selected="true"] {
+  border-inline-start-color: var(--ag-accent);
+}
+.ag-tabs__panel--offscreen {
+  position: fixed;
+  left: -100000px;
+  top: 0;
+  width: max-content;
+  max-width: none;
+  pointer-events: none;
+}
+@media (max-width: 560px) {
+  .ag-tabs[data-orientation="vertical"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ag-tabs[data-orientation="vertical"] > .ag-tabs__list {
+    flex-direction: column;
+    max-block-size: 240px;
+    border-inline-end: 0;
+    border-block-end: 1px solid var(--ag-border);
+  }
+}

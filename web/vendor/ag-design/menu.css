@@ -1,0 +1,102 @@
+.ag-menu {
+  display: inline-block;
+  color: var(--ag-text);
+  font: inherit;
+}
+.ag-menu__trigger {
+  box-sizing: border-box;
+  min-height: var(--ag-control-height, 32px);
+  padding: 6px 12px;
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius-control, 7px);
+  color: var(--ag-text);
+  background: var(--ag-surface-alt);
+  font: inherit;
+  cursor: pointer;
+}
+.ag-menu__trigger::after {
+  content: "⌄";
+  margin-inline-start: 8px;
+}
+.ag-menu__trigger:focus-visible,
+.ag-menu__item:focus-visible {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: -2px;
+}
+.ag-menu__popup {
+  position: fixed;
+  z-index: var(--ag-layer-popup, 40);
+  box-sizing: border-box;
+  min-width: min(220px, calc(100vw - 16px));
+  max-width: calc(100vw - 16px);
+  padding: 5px;
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius-panel, 12px);
+  color: var(--ag-text);
+  background: var(--ag-surface);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
+  overflow: auto;
+}
+.ag-menu__popup[hidden] {
+  display: none !important;
+}
+.ag-menu__item {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 1em minmax(0, 1fr) auto 1em;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: var(--ag-control-height, 32px);
+  padding: 6px 9px;
+  border: 0;
+  border-radius: var(--ag-radius-control, 7px);
+  font: inherit;
+  line-height: 1.4;
+  color: var(--ag-text);
+  background: transparent;
+  text-align: start;
+  cursor: pointer;
+}
+.ag-menu__item:hover,
+.ag-menu__item:focus {
+  background: var(--ag-surface-alt);
+}
+.ag-menu__item[aria-disabled="true"] {
+  color: var(--ag-muted);
+  cursor: not-allowed;
+}
+.ag-menu__label {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.ag-menu__shortcut {
+  font-size: 0.9em;
+  color: var(--ag-muted);
+  white-space: nowrap;
+  text-align: end;
+  min-width: 4ch;
+}
+.ag-menu__mark {
+  display: inline-block;
+  min-width: 1em;
+}
+.ag-menu__arrow {
+  font-size: 1.2em;
+  min-width: 1em;
+  text-align: center;
+}
+:dir(rtl) > .ag-menu__arrow {
+  transform: scaleX(-1);
+}
+.ag-menu__separator {
+  height: 1px;
+  background: var(--ag-border);
+  margin: 5px 4px;
+}
+@media (forced-colors: active) {
+  .ag-menu__item:focus {
+    outline: 2px solid Highlight;
+  }
+}

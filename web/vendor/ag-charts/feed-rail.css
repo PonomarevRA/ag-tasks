@@ -1,0 +1,183 @@
+.ag-vt.ag-vt-feed-rail {
+  background: transparent;
+  flex: 0 0 var(--ag-feed-rail-gutter-width, 20px);
+  min-width: 0;
+  width: var(--ag-feed-rail-gutter-width, 20px);
+}
+/* The gutter supplies horizontal position; measured bounds keep the dock inside the visible catalogue. */
+.ag-vt-feed-rail__dock {
+  position: fixed;
+  top: 0;
+  transform: translateY(-50%);
+  width: 24px;
+  box-sizing: border-box;
+  padding: 0;
+  border: 0;
+  outline: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ag-vt-feed-rail__dock[hidden] {
+  display: none;
+}
+.ag-vt-feed-rail .ag-vt-rail--compact ol {
+  max-height: min(65dvh, 480px, var(--ag-feed-rail-height, 0px));
+  overscroll-behavior: contain;
+}
+.ag-vt-feed-rail .ag-vt-rail--compact .ag-vt-rail__item {
+  width: 100%;
+  scroll-margin-block: 8px;
+}
+.ag-vt-feed-rail__range {
+  width: 100%;
+  font: inherit;
+  color: var(--ag-text);
+  background: var(--ag-surface);
+  margin: 0;
+}
+.ag-vt-feed-rail__controls {
+  display: grid;
+  justify-items: stretch;
+  gap: 4px;
+}
+.ag-vt-feed-rail__position {
+  font-size: max(12px, 0.75rem);
+  line-height: 1.3;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--ag-muted);
+}
+.ag-vt-feed-rail__browse {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ag-text);
+  font-size: max(12px, 0.75rem);
+  min-width: 0;
+  flex-wrap: wrap;
+  cursor: pointer;
+}
+.ag-vt-feed-rail__browse span {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.ag-vt-feed-rail__browse svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+}
+.ag-vt-feed-rail__browse:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.ag-vt-feed-rail__browse:hover:not(:disabled) {
+  background: var(--ag-surface-alt);
+}
+.ag-vt-feed-rail__browse:focus-visible {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: 1px;
+}
+@media (pointer: coarse) {
+  .ag-vt.ag-vt-feed-rail {
+    width: var(--ag-feed-rail-gutter-width, 24px);
+    flex-basis: var(--ag-feed-rail-gutter-width, 24px);
+  }
+  .ag-vt-feed-rail__dock {
+    width: 44px;
+    margin-inline-start: -10px;
+  }
+  .ag-vt-feed-rail .ag-vt-rail--compact .ag-vt-rail__item {
+    width: 100%;
+    min-height: 44px;
+  }
+  .ag-vt-feed-rail__browse {
+    min-height: 44px;
+  }
+}
+
+.ag-vt-feed-demo {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+}
+.ag-vt-feed-demo__body {
+  height: 280px;
+  overflow: auto;
+  min-width: 0;
+  padding: 8px;
+  background: var(--ag-surface);
+}
+.ag-vt-feed-demo__body section {
+  min-height: 100px;
+  scroll-margin-top: 8px;
+  color: var(--ag-text);
+}
+.ag-vt-feed-demo__body p {
+  color: var(--ag-muted);
+}
+@media (pointer: coarse) {
+  .ag-vt-feed-demo {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+}
+
+/* The fixed dock grows over neighbouring content. Its host gutter never changes on hover/focus.
+   aria-expanded also keeps fallback body-portal previews inside this expanded interaction. */
+.ag-vt-feed-rail .ag-vt-rail--compact {
+  width: 100%;
+  flex-basis: auto;
+  background: transparent;
+}
+.ag-vt-feed-rail .ag-vt-rail--compact .ag-vt-rail__tick {
+  min-width: 0;
+  max-width: 28px;
+  flex-shrink: 1;
+  background: var(--ag-text);
+  opacity: var(--ag-feed-marker-opacity, 0.6);
+}
+.ag-vt-feed-rail
+  .ag-vt-rail--compact
+  .ag-vt-rail__item:is(:hover, :focus-visible, [aria-current])
+  .ag-vt-rail__tick {
+  opacity: 1;
+}
+.ag-vt-feed-rail:is(
+    :hover,
+    :focus-within,
+    :has(.ag-vt-rail__item[aria-expanded="true"])
+  )
+  .ag-vt-feed-rail__dock {
+  width: 64px;
+  padding-inline: 4px;
+  outline-color: var(--ag-border);
+  background: var(--ag-surface);
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--ag-text) 20%, transparent);
+}
+/* Hidden compact chrome remains readable in the accessibility tree; expansion restores visible counts. */
+.ag-vt-feed-rail:not(:hover):not(:focus-within):not(
+    :has(.ag-vt-rail__item[aria-expanded="true"])
+  )
+  :is(.ag-vt-feed-rail__position, .ag-vt-feed-rail__browse span) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

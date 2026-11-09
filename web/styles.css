@@ -1,0 +1,203 @@
+:root{color-scheme:light dark;--bg:#f1f2f4;--panel:#fff;--subtle:#f7f8fa;--text:#24262b;--muted:#6b707a;--line:#e0e3e9;--blue:#2067d2;--selected:#e8f1ff;--danger:#c34343;font:13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text)}button,input,select,textarea{font:inherit;color:inherit}button{border:1px solid var(--line);background:var(--panel);border-radius:7px;padding:6px 11px;min-height:30px;cursor:pointer}button:hover{filter:brightness(.96)}button:disabled{opacity:.45;cursor:default}button.primary{background:var(--blue);border-color:var(--blue);color:#fff}input,select,textarea{border:1px solid var(--line);background:var(--subtle);border-radius:7px;padding:7px;min-width:0;width:100%}textarea{resize:vertical}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}a{color:var(--blue)}.app-window{max-width:1560px;margin:20px auto;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--panel);box-shadow:0 12px 50px #0001}header{height:56px;padding:10px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.identity{display:flex;align-items:center;gap:10px}.identity strong{font-size:16px}.subtitle{color:var(--muted);border-left:1px solid var(--line);padding-left:12px}.app-dot{width:15px;height:15px;border:2px solid var(--blue);border-radius:50%;box-shadow:inset 0 0 0 2px var(--panel);background:#78afff}.workspace{display:grid;grid-template-columns:178px minmax(0,1fr);min-height:calc(100dvh - 98px)}aside{border-right:1px solid var(--line);background:var(--subtle);padding:16px 10px}nav{display:grid;gap:5px}nav button{text-align:left;border-color:transparent;background:transparent}nav button.active{background:var(--selected);color:var(--blue)}.aside-note{padding:16px 7px;color:var(--muted);font-size:11px;line-height:1.6}main{padding:22px;min-width:0;overflow:auto}.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}h1{font-size:21px;font-weight:600;margin:0}h2{font-size:17px;margin:0}h3{font-size:13px;margin:0 0 12px}p{line-height:1.5}#notice{color:var(--danger);min-height:0}#notice:empty{display:none}.board{display:grid;grid-auto-columns:minmax(210px,1fr);grid-auto-flow:column;gap:12px;overflow-x:auto;padding-bottom:15px}.column{background:var(--subtle);border:1px solid var(--line);border-radius:10px;padding:11px;min-height:260px}.column-heading{display:flex;justify-content:space-between;color:var(--muted);margin-bottom:14px;font-size:12px}.card{display:block;width:100%;text-align:left;padding:12px;margin-bottom:9px;border-radius:8px;box-shadow:0 1px 3px #0001}.card strong{display:block;font-weight:500;line-height:1.45;margin:7px 0}.key,.muted,.meta{color:var(--muted);font-size:12px}.meta{display:flex;gap:8px;flex-wrap:wrap}.priority{font-size:11px;color:var(--blue)}.issue-list{display:grid;gap:7px}.issue-row{display:grid;grid-template-columns:76px minmax(160px,1fr) 115px 100px;align-items:center;gap:12px;text-align:left;padding:12px}.empty{padding:35px 12px;color:var(--muted);text-align:center;border:1px dashed var(--line);border-radius:10px}.repo-form,.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.repo-form{max-width:760px;align-items:end;margin-bottom:25px}.repo-form button{justify-self:start}.repo{padding:16px 0;border-top:1px solid var(--line)}code,pre{font-family:ui-monospace,SFMono-Regular,monospace;font-size:11px}code{overflow-wrap:anywhere}pre{background:var(--subtle);padding:12px;border:1px solid var(--line);border-radius:7px;overflow:auto;white-space:pre-wrap;max-height:360px}dialog{border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);width:min(740px,calc(100vw - 30px));max-height:90dvh;padding:22px;box-shadow:0 20px 90px #0004}dialog::backdrop{background:#0005;backdrop-filter:blur(3px)}.dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px}.dialog-heading>button{padding:2px 8px;font-size:18px}.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}label{display:block;color:var(--muted);font-size:12px;margin-bottom:14px}label>input,label>textarea,label>select{display:block;margin-top:6px;color:var(--text)}.status-bar,.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0}.status-bar select{width:auto}.section{border-top:1px solid var(--line);margin-top:20px;padding-top:18px}.description{white-space:pre-wrap}.history{padding:9px 0;border-bottom:1px solid var(--line)}.history p{margin:4px 0}.consent{display:flex;align-items:center;gap:9px;color:var(--text);margin-top:20px}.consent input{width:auto;margin:0}.inline-form{display:flex;gap:8px;align-items:end}.inline-form label{flex:1;margin:0}.external{display:block;margin:7px 0;overflow-wrap:anywhere}.native-shell .app-window{margin:0;max-width:none;border:0;border-radius:0;box-shadow:none;min-height:100dvh}.native-shell .workspace{min-height:calc(100dvh - 56px)}@media(prefers-color-scheme:dark){:root{--bg:#111215;--panel:#202126;--subtle:#1a1b20;--text:#e3e5eb;--muted:#989ca8;--line:#34363f;--blue:#62a4ff;--selected:#26344c;--danger:#ff8b8b}button.primary{color:#111825}}@media(max-width:750px){.app-window{margin:0;border:0;border-radius:0}.workspace{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid var(--line);padding:6px}nav{display:flex;gap:5px}.aside-note,.subtitle{display:none}main{padding:16px}.issue-row{grid-template-columns:65px 1fr 90px}.field-grid,.repo-form{grid-template-columns:1fr}.board{grid-auto-columns:250px}dialog{padding:16px}}
+
+/* Native toolbar owns the collapse command only after the platform adapter reports success. */
+.native-toolbar #sidebar-toggle{display:none}
+nav button{display:flex;align-items:center;gap:9px}
+.nav-icon{font-size:17px;width:20px;flex:none;text-align:center}
+.sidebar-collapsed .workspace{grid-template-columns:50px minmax(0,1fr)}
+.sidebar-collapsed aside{padding:12px 5px}
+.sidebar-collapsed .nav-label,.sidebar-collapsed .aside-note{display:none}
+.sidebar-collapsed nav{display:grid}
+.sidebar-collapsed nav button{justify-content:center;padding:7px 4px}
+@media(max-width:750px){.sidebar-collapsed aside{border-right:1px solid var(--line);border-bottom:0}}
+/* Header groups share the navigation boundary; collapse preserves the icon rail. */
+:root{--nav-width:178px}
+.sidebar-collapsed{--nav-width:50px}
+.workspace{grid-template-columns:var(--nav-width) minmax(0,1fr)}
+header{display:grid;grid-template-columns:var(--nav-width) minmax(0,1fr);padding:0;gap:0}
+.nav-header{height:56px;padding:0 10px;border-right:1px solid var(--line);display:flex;align-items:center;justify-content:flex-end}
+.content-header{min-width:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px}
+.identity{min-width:0;gap:8px;flex-shrink:0}
+.identity .subtitle{display:none}
+.content-header>#create{flex-shrink:0}
+.sidebar-collapsed .nav-header{justify-content:center;padding:0 4px}
+@media(max-width:750px){.workspace{grid-template-columns:1fr}.sidebar-collapsed .workspace{grid-template-columns:var(--nav-width) minmax(0,1fr)}}
+
+/* The real titlebar owns identity only after its native capability is ready. */
+.native-shell.native-toolbar.native-identity.native-window-commands .app-window>header{display:none}
+.native-shell.native-toolbar.native-identity.native-window-commands .workspace{min-height:100dvh}
+.toolbar-actions{display:flex;align-items:center;gap:8px}
+
+/* Workspace controls retain the host palette and the measured native sidebar boundary. */
+#space-manage{display:flex;align-items:center;gap:6px;justify-content:flex-start}
+.sidebar-collapsed #space-manage{justify-content:center;padding-inline:0}
+.space-list{display:grid;gap:6px;margin-bottom:22px}
+.space-list button{text-align:left}
+.space-list [aria-current=true]{background:var(--selected);color:var(--blue)}
+.view-filters{display:grid;grid-template-columns:minmax(160px,1fr) minmax(160px,220px);gap:12px;max-width:720px;margin-bottom:16px}
+.view-filters label{margin:0}
+.coverage-notice{font-size:12px;line-height:1.5;color:var(--muted);overflow-wrap:anywhere}
+.coverage-notice:empty{display:none}
+.task-graph-viewport{height:calc(100dvh - 350px);min-height:280px;max-height:900px;border:1px solid var(--line);border-radius:10px}
+.task-graph-scene{position:relative;width:max-content;padding:24px;min-height:280px}
+.task-graph-groups{display:flex;align-items:flex-start;gap:24px}
+.task-graph-group{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--panel)}
+.task-group-heading{font-size:12px;font-weight:600;max-width:650px;line-height:1.5;overflow-wrap:anywhere;margin-bottom:18px}
+.task-graph-levels{display:flex;gap:40px;align-items:flex-start}
+.task-graph-level{display:grid;gap:16px;width:235px;flex:none}
+.task-graph-card.ag-button{position:relative;z-index:2;display:flex;align-items:flex-start;flex-direction:column;gap:7px;min-width:0;width:100%;padding:12px;white-space:normal;text-align:left;background:var(--panel);box-shadow:0 2px 5px #0001}
+.task-graph-card strong{line-height:1.45;overflow-wrap:anywhere}
+.task-graph-card .ag-status{font-size:11px}
+.task-graph-edges{position:absolute;top:0;left:0;z-index:1;pointer-events:none;overflow:visible}
+.task-graph-edges path{fill:none;stroke:var(--blue);stroke-width:1.5;opacity:1}
+.task-graph-edges path:not([data-kind=parent]){stroke-dasharray:5 4;stroke:var(--muted)}
+.graph-toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap}
+.graph-stubs{margin-top:12px}
+.graph-stubs button{display:block;margin-top:7px}
+.review-label{font-size:11px;color:var(--blue)}
+#detail{width:min(920px,calc(100vw - 30px))}
+.task-facts{display:grid;grid-template-columns:minmax(130px,.7fr) minmax(0,1.3fr);gap:8px 16px;font-size:12px}
+.task-facts dt{color:var(--muted)}
+.task-facts dd{margin:0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.criteria-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.criterion{padding:12px 0;border-bottom:1px solid var(--line)}
+.criterion strong{display:block;margin-top:7px;overflow-wrap:anywhere;line-height:1.5}
+.criterion p{margin:5px 0}
+.criteria-fieldset{border:1px solid var(--line);border-radius:8px;margin:16px 0;padding:12px}
+.criteria-fieldset legend{font-size:12px;color:var(--muted);padding-inline:5px}
+.criterion-editor{border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:12px;display:grid;gap:8px}
+.criterion-declaration{display:flex;align-items:center;gap:8px;margin:0;font-size:11px}
+.criterion-declaration input{width:auto;margin:0}
+.criterion-editor .criterion-remove{justify-self:start}
+.result-list ul{padding-left:22px;line-height:1.6;overflow-wrap:anywhere}
+.danger-action{color:var(--danger);border-color:var(--danger)}
+.inline-form{flex-wrap:wrap}
+.inline-form label{min-width:160px}
+.inline-form button,.repo-form button{align-self:end;justify-self:start;width:auto;min-height:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;line-height:normal}
+.status-bar button{white-space:normal}
+details>summary{cursor:pointer;line-height:1.6}
+details>textarea{margin-top:10px}
+.task-graph-card:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+@media(max-width:750px){
+ .view-filters{grid-template-columns:1fr}
+ .criteria-grid{grid-template-columns:1fr}
+ .toolbar{align-items:flex-start;gap:12px;flex-wrap:wrap}
+ .toolbar-actions{flex-wrap:wrap}
+ .task-graph-viewport{max-height:60dvh;min-height:280px}
+ .task-graph-scene{padding:14px}
+ .task-graph-level{width:210px}
+ .task-facts{grid-template-columns:1fr}
+ .task-facts dd{margin-bottom:6px}
+}
+
+.task-graph-edges path.graph-arrowhead{fill:var(--blue);stroke:none;opacity:1;stroke-dasharray:none}
+.issue-row{grid-template-columns:76px minmax(160px,1fr) 115px minmax(140px,200px)}
+@media(max-width:750px){.issue-row{grid-template-columns:65px minmax(0,1fr) 90px}}
+
+/* A collapsed rail must not hide the current data scope. Shrink grid tracks before inner scrolling. */
+.toolbar-title{min-width:0;max-width:100%}
+.space-breadcrumb{font-size:11px;color:var(--muted);margin:0 0 5px;overflow-wrap:anywhere}
+.toolbar h1,.card strong,.issue-row strong{overflow-wrap:anywhere}
+aside,nav{min-width:0}
+.toolbar-actions{max-width:100%}
+.toolbar-actions button{max-width:100%}
+@media(max-width:750px){
+ .workspace{grid-template-columns:minmax(0,1fr)}
+ .sidebar-collapsed .workspace{grid-template-columns:var(--nav-width) minmax(0,1fr)}
+ .ag-nav{min-width:0;max-width:100%}
+ #space-manage{max-width:100%}
+}
+
+/* The service identity uses the same vector silhouette in both themes; colour is owned by the host. */
+.app-dot{display:inline-block;flex:none;width:20px;height:20px;border:0;border-radius:0;box-shadow:none;outline:0;font-size:0;background:var(--blue);-webkit-mask:url("/brand/mark.svg") center/contain no-repeat;mask:url("/brand/mark.svg") center/contain no-repeat}
+
+/* A saved expanded width never changes the side or width of the collapsed icon rail. */
+.sidebar-collapsed{--nav-width:50px!important}.sidebar-collapsed #sidebar{width:50px!important}.sidebar-collapsed .ag-panel-resizer{display:none}
+.ag-window-shell-host>.identity{display:none}.ag-window-shell-host .ag-window-toolbar{border:0;background:transparent;padding:0}.ag-window-shell-host{padding-inline:12px}
+
+/* A history toggle is a compact checkbox, not a full-width text field. */
+.history-toggle { display: inline-flex; align-items: center; gap: .5rem; margin-block: .5rem; color: var(--muted); cursor: pointer; }
+.history-toggle input[type="checkbox"] { width: 1rem; height: 1rem; margin: 0; flex: 0 0 auto; }
+.active-work-toggle { flex-wrap:wrap; color:var(--text); }
+.active-work-toggle[hidden] { display:none; }
+.space-list .space-choice { display:flex; flex-direction:column; align-items:flex-start; min-width:0; height:auto; white-space:normal; text-align:left; padding:10px 12px; }
+.space-choice[aria-current="true"] { border-color:var(--blue); background:var(--selected); }
+.space-name { display:block; overflow-wrap:anywhere; font-weight:600; }
+.space-summary { display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:6px; max-width:100%; color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; white-space:normal; }
+.space-summary>span { min-width:0; }
+.space-in-progress,.space-activity--active,.space-activity--recent { color:var(--blue); }
+
+/* Shared rows keep help text from moving one control above its neighbours. */
+#space-form { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) auto; grid-template-areas:"name-label prefix-label ." "name prefix action" ". hint ."; gap:8px; align-items:stretch; }
+#space-form label { margin:0; line-height:1.4; }
+#space-form .space-name-label { grid-area:name-label; }
+#space-form .space-prefix-label { grid-area:prefix-label; }
+#space-name { grid-area:name; }
+#space-prefix { grid-area:prefix; }
+#space-form input { min-height:36px; padding:8px 10px; border-color:var(--muted); }
+#space-prefix-hint { grid-area:hint; min-width:0; color:var(--muted); line-height:1.5; overflow-wrap:anywhere; }
+#space-form button { grid-area:action; height:auto; min-height:36px; align-self:stretch; }
+@media(max-width:650px) {
+  #space-form { grid-template-columns:minmax(0,1fr); grid-template-areas:"name-label" "name" "prefix-label" "prefix" "hint" "action"; }
+  #space-form .space-prefix-label { margin-top:8px; }
+  #space-form button { justify-self:start; margin-top:8px; }
+}
+
+/* A card is one accessible action; status and lifecycle precede supporting metadata. */
+.task-card-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;flex-wrap:wrap}
+.task-card-title{font-size:13px;line-height:1.45;overflow-wrap:anywhere}
+.task-card-role{font-size:11px;font-weight:600}.task-card-facts{font-size:10px;line-height:1.5}
+:is(.card,.task-graph-card,.issue-row)>p{margin:0;font-size:11px;line-height:1.45}
+.issue-row{display:flex;flex-direction:column;align-items:stretch;text-align:left;gap:7px}
+.task-labels{gap:4px}.task-labels .ag-status{font-size:10px}
+@media(max-width:750px){
+ body,.sidebar-collapsed{--nav-width:52px!important}
+ .workspace,.sidebar-collapsed .workspace{display:grid;grid-template-columns:52px minmax(0,1fr)}
+ #sidebar,.sidebar-collapsed #sidebar{width:52px!important;min-width:0;padding:8px 5px;border-right:1px solid var(--line);border-bottom:0}
+ #sidebar nav{display:grid;gap:5px;overflow:visible}#sidebar nav button{justify-content:center;padding:7px 0;min-width:0}
+ #sidebar .nav-label,#sidebar .aside-note{display:none}
+ .ag-panel-resizer{display:none}
+ .app-window>header{height:auto;min-height:56px;align-items:stretch;grid-template-columns:52px minmax(0,1fr)}
+ .nav-header{height:auto;min-height:56px;padding:0 4px;justify-content:center}
+ .content-header{padding:6px 8px;min-width:0;flex-wrap:wrap;gap:6px}
+ .content-header .ag-window-toolbar{flex-wrap:wrap;min-width:0}.content-header .ag-window-toolbar__title{min-width:0;overflow-wrap:anywhere}
+ main{min-width:0;padding:16px 10px}
+}
+
+/* The generic header rule must not fix the height of the nested, wrapping shared toolbar. */
+.ag-window-shell-host .ag-window-toolbar{height:auto;min-height:32px}
+
+.task-graph-viewport .ag-board__controls .ag-button{width:auto;white-space:nowrap}
+
+/* Native dialogs retain their contextual header; only the body owns vertical scrolling. */
+dialog {padding:0;overflow:hidden;}
+dialog[open] {display:flex;flex-direction:column;}
+dialog>form {display:flex;flex-direction:column;min-height:0;max-height:inherit;}
+dialog .dialog-heading {flex:none;margin:0;padding:18px 22px;border-bottom:1px solid var(--line);background:var(--panel);}
+dialog .dialog-heading h2 {min-width:0;overflow-wrap:anywhere;}
+dialog .dialog-heading>button {flex:none;}
+dialog .dialog-body {min-height:0;overflow:auto;overscroll-behavior:contain;padding:20px 22px;}
+dialog .dialog-actions {flex:none;margin:0;padding:14px 22px;border-top:1px solid var(--line);background:var(--panel);flex-wrap:wrap;}
+.editor-options {border-top:1px solid var(--line);padding:12px 0;}
+.editor-options>summary {cursor:pointer;font-weight:600;line-height:1.5;overflow-wrap:anywhere;}
+.editor-options>summary:focus-visible {outline:2px solid var(--blue);outline-offset:3px;}
+.editor-options[open]>summary {margin-bottom:14px;}
+@media(max-width:750px) {dialog .dialog-heading,dialog .dialog-body,dialog .dialog-actions {padding:14px 16px;}}
+/* Remote chat identifiers remain readable at narrow widths and enlarged text. */
+.task-conversations { padding-inline-start: 1.25rem; }
+.task-conversations li { margin-block: .75rem; overflow-wrap: anywhere; }
+.task-conversations p { margin-block: .25rem; }
+
+/* Group service destinations separately from the project switcher and scoped views. */
+#sidebar .ag-nav {display:grid;gap:12px}
+.nav-group {display:grid;gap:4px;min-width:0}
+.nav-group + .nav-group {border-block-start:1px solid var(--ag-border);padding-block-start:12px}
+.nav-group-label {margin:0;padding-inline:8px;color:var(--ag-muted);font-size:.85rem;font-weight:600}
+#sidebar .space-picker {min-width:0;max-width:100%;text-align:start}
+.space-picker #space-picker-label {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.space-picker-chevron {margin-inline-start:auto;flex:none;color:var(--ag-muted)}
+.sidebar-collapsed .nav-group-label {display:none}
+@media(max-width:750px) {
+  .nav-group-label {display:none}
+  #sidebar .nav-group #space-manage {justify-content:center}
+}

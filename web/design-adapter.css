@@ -1,0 +1,15 @@
+/* Reuse the Tasks palette without importing another application's brand colours. */
+:root{--ag-accent:var(--blue);--ag-on-accent:#fff;--ag-surface:var(--panel);--ag-surface-alt:var(--subtle);--ag-text:var(--text);--ag-muted:var(--muted);--ag-border:var(--line);--ag-danger:var(--danger)}
+.ag-nav{padding:0}
+.ag-nav .ag-button{min-width:0;width:100%}
+.ag-nav .ag-button[aria-current=page]{background:var(--selected);color:var(--blue)}
+.ag-field :is(input,select,textarea){font-size:13px}
+.ag-field>:is(input,select,textarea){margin-top:0}
+.card.ag-button{display:block;width:100%;white-space:normal;text-align:left}
+.issue-row.ag-button{display:flex;flex-direction:column;align-items:stretch;width:100%;white-space:normal;text-align:left}
+.sidebar-collapsed .ag-nav .ag-button{justify-content:center;padding-inline:0}
+.skip:not(:focus){position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.skip:focus{position:fixed;top:6px;left:6px;z-index:100;padding:10px;background:var(--panel)}
+@media(prefers-color-scheme:dark){:root{--ag-on-accent:#111825}}
+@media(max-width:750px){.ag-nav{display:flex;overflow:auto}.ag-nav .ag-button{width:auto}.sidebar-collapsed .ag-nav{display:grid;overflow:visible}.sidebar-collapsed .ag-nav .ag-button{width:100%}}
+@media(pointer:coarse){.sidebar-collapsed aside{padding-inline:2px}.ag-nav .ag-button{min-height:44px}}

@@ -1,0 +1,28 @@
+.ag-tooltip.ag-inline-help__panel {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  box-sizing: border-box;
+  z-index: var(--ag-layer-popup, 40);
+  border: 1px solid var(--ag-border);
+  border-radius: 8px;
+  background: var(--ag-surface-alt);
+  color: var(--ag-text);
+  font-family: var(--ag-font);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  max-inline-size: min(280px, calc(100vw - 24px));
+  font-size: 13px;
+  line-height: 1.4;
+}
+.ag-tooltip > .ag-inline-help__content {
+  display: block;
+  max-block-size: var(--ag-help-max-height, calc(100vh - 24px));
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 7px 10px;
+}
+
+.ag-tooltip[hidden] {
+  display: none !important;
+}

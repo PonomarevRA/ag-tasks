@@ -1,0 +1,75 @@
+/* Feedback is outside the native editing area: long values and resize handles stay unobstructed. */
+.ag-field__feedback {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+  min-inline-size: 0;
+}
+.ag-field__messages {
+  display: grid;
+  gap: 4px;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+.ag-field__messages:empty {
+  display: none;
+}
+.ag-field__counter {
+  inline-size: 100%;
+  max-inline-size: 100%;
+  color: var(--ag-muted);
+  font-size: max(12px, 0.8em);
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  overflow-wrap: anywhere;
+}
+.ag-field__counter[hidden] {
+  display: none;
+}
+.ag-field__counter[data-state="over"] {
+  color: var(--ag-danger);
+}
+.ag-text-feedback__sr {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.ag-text-block {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  color: var(--ag-text);
+  font: var(--ag-text-size)/1.5 var(--ag-font);
+}
+.ag-text-block__content {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+.ag-text-block__content:focus-visible {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: 4px;
+}
+.ag-text-block__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-block-start: 6px;
+}
+.ag-text-block__status {
+  color: var(--ag-muted);
+  font-size: max(12px, 0.85em);
+  overflow-wrap: anywhere;
+}
+@media (forced-colors: active) {
+  .ag-field__counter,
+  .ag-text-block__status {
+    color: CanvasText;
+  }
+  .ag-text-block__content:focus-visible {
+    outline-color: Highlight;
+  }
+}

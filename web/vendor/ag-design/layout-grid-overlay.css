@@ -1,0 +1,63 @@
+.ag-layout-grid {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  --ag-grid-guide: var(--ag-accent);
+  --ag-grid-hit: var(--ag-success);
+  --ag-grid-miss: var(--ag-danger);
+}
+.ag-layout-grid__guide,
+.ag-layout-grid__diagonal {
+  stroke: var(--ag-grid-guide);
+  stroke-width: 0.7;
+  opacity: 0.25;
+  vector-effect: non-scaling-stroke;
+}
+.ag-layout-grid__diagonal {
+  opacity: 0.16;
+}
+.ag-layout-grid__point {
+  fill: var(--ag-grid-guide);
+  opacity: 0.4;
+}
+.ag-layout-grid [data-status="hit"] {
+  color: var(--ag-grid-hit);
+}
+.ag-layout-grid [data-status="miss"] {
+  color: var(--ag-grid-miss);
+}
+.ag-layout-grid [data-status="unknown"] {
+  color: var(--ag-muted);
+}
+.ag-layout-grid__target {
+  fill: var(--ag-surface);
+  stroke: currentColor;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.ag-layout-grid [data-status="hit"] .ag-layout-grid__target {
+  fill: currentColor;
+}
+.ag-layout-grid__anchor {
+  fill: var(--ag-surface);
+  stroke: currentColor;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.ag-layout-grid__residual {
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-dasharray: 3 2;
+  vector-effect: non-scaling-stroke;
+}
+.ag-layout-grid__target-line {
+  stroke: currentColor;
+  stroke-width: 1.5;
+  opacity: 0.7;
+  vector-effect: non-scaling-stroke;
+}
+
+.ag-layout-grid__region { fill:var(--ag-grid-guide);fill-opacity:.025;stroke:var(--ag-grid-guide);stroke-width:.7;stroke-opacity:.3;vector-effect:non-scaling-stroke; }
+.ag-layout-grid__curve { fill:none;stroke:var(--ag-grid-guide);stroke-width:.8;opacity:.35;vector-effect:non-scaling-stroke; }

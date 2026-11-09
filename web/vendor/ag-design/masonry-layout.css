@@ -1,0 +1,11 @@
+/* Geometry is instance-owned; surfaces and text inherit the local color profile. */
+.ag-masonry-layout {
+  min-width: 0;
+}
+.ag-masonry-layout > * {
+  min-width: 0;
+}
+/* Native hidden must win over the instance's inline display:grid geometry. */
+.ag-masonry-layout[hidden] {
+  display: none !important;
+}

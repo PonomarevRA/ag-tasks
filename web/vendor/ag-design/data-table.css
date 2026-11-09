@@ -1,0 +1,117 @@
+.ag-data-table {
+  display: grid;
+  gap: 0.6rem;
+  min-width: 0;
+  color: var(--ag-text);
+  font: inherit;
+}
+.ag-data-table__scroll {
+  min-width: 0;
+  max-width: 100%;
+  overflow: auto;
+  border: 1px solid var(--ag-border);
+  border-radius: var(--ag-radius, 8px);
+  background: var(--ag-surface);
+}
+.ag-data-table table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font: inherit;
+}
+.ag-data-table caption {
+  text-align: start;
+  font-weight: 600;
+  padding: 0.75rem;
+  overflow-wrap: anywhere;
+}
+.ag-data-table th,
+.ag-data-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: start;
+  border-block-start: 1px solid var(--ag-border);
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  max-width: 32rem;
+}
+.ag-data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--ag-surface-alt, var(--ag-surface));
+  font-weight: 600;
+}
+.ag-data-table__sort {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  min-height: 32px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+.ag-data-table__sort:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.ag-data-table input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--ag-accent);
+  margin: 0;
+  cursor: pointer;
+}
+.ag-data-table input:disabled {
+  cursor: default;
+}
+.ag-data-table tbody tr:has(input:checked) {
+  background: color-mix(in srgb, var(--ag-accent) 10%, var(--ag-surface));
+}
+.ag-data-table__empty {
+  padding: 1.5rem !important;
+  text-align: center !important;
+  color: var(--ag-muted);
+}
+.ag-data-table__status {
+  margin: 0;
+  color: var(--ag-muted);
+  overflow-wrap: anywhere;
+}
+.ag-data-table__pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+.ag-data-table [hidden] {
+  display: none !important;
+}
+.ag-data-table :focus-visible {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ag-data-table * {
+    scroll-behavior: auto;
+  }
+}
+
+.ag-data-table td[data-align="end"] {
+  font-variant-numeric: tabular-nums;
+}
+
+.ag-data-table__selection-target {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+  cursor: pointer;
+}

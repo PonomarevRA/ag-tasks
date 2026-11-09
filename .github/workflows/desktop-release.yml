@@ -1,0 +1,72 @@
+name: Standalone installers
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            payload: "dist/Ag Tasks.app"
+          - os: windows-2022
+            payload: dist/AgTasks
+          - os: ubuntu-24.04
+            payload: dist/AgTasks
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Linux GUI build dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y python3-tk libegl1 libgl1 libxkbcommon-x11-0 libxcb-cursor0 libnss3 libasound2t64
+      - run: python -m pip install ".[desktop,test]"
+      - run: npm ci
+      - run: python -m pytest -q
+      - run: npm test
+      - run: python packaging/build.py
+      - name: Windows installer compiler
+        if: runner.os == 'Windows'
+        run: choco install innosetup --no-progress --yes
+      - name: Build platform installer
+        run: python packaging/build_installer.py --manifest packaging/desktop-product.json --source "${{ matrix.payload }}" --output artifacts/installers
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ag-tasks-${{ matrix.os }}
+          path: artifacts/installers
+          if-no-files-found: error
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: native
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Match tag to product version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python -c "import json,os; assert os.environ['RELEASE_TAG']=='v'+json.load(open('packaging/desktop-product.json'))['version']"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ag-tasks-*
+          merge-multiple: true
+          path: release-assets
+      - name: Publish platform installers
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          cd release-assets
+          cat *.sha256 > SHA256SUMS
+          gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --title "$RELEASE_TAG" --notes "Standalone installers. macOS builds are ad-hoc signed and not notarized. Setup selects external artifact and backup folders." -- *.dmg *.exe *.tar.gz *.json SHA256SUMS

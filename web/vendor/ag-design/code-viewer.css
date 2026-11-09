@@ -1,0 +1,264 @@
+@import "./tooltip.css";
+.ag-code-viewer {
+  min-width: 0;
+  color: var(--ag-text);
+  background: var(--ag-surface);
+  font: inherit;
+  border: 1px solid var(--ag-border);
+  border-radius: 10px;
+  overflow: clip;
+}
+.ag-code-viewer__toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  min-height: 44px;
+  padding: 6px 10px;
+  background: var(--ag-surface-alt);
+}
+.ag-code-viewer__title {
+  flex: 1 1 120px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.ag-code-viewer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.ag-code-viewer__action {
+  min-height: 32px;
+  padding: 4px 8px;
+  color: var(--ag-text);
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+.ag-code-viewer__action:hover:not(:disabled),
+.ag-code-viewer__action[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--ag-accent) 14%, transparent);
+}
+.ag-code-viewer__action:focus-visible {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: 2px;
+}
+.ag-code-viewer__action:disabled {
+  color: var(--ag-muted);
+  cursor: default;
+}
+.ag-code-viewer__surface {
+  min-width: 0;
+  font-size: 0.875rem;
+}
+.ag-code-viewer__fallback {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 12px;
+  height: var(--ag-code-height, 320px);
+  overflow: auto;
+  white-space: pre;
+  color: inherit;
+  background: inherit;
+  font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+.ag-code-viewer__surface:focus-within {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: -2px;
+}
+.ag-code-viewer__status {
+  min-height: 0;
+  margin: 0;
+  padding: 0 12px;
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+.ag-code-viewer__status:not(:empty) {
+  padding-block: 6px;
+}
+.ag-code-viewer .cm-search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+}
+.ag-code-viewer .cm-search input,
+.ag-code-viewer .cm-search button {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-height: 32px;
+  padding: 4px 8px;
+  color: var(--ag-text);
+  background: var(--ag-surface);
+  border: 1px solid var(--ag-border);
+  border-radius: 4px;
+  font: inherit;
+}
+.ag-code-viewer .cm-search input[type="checkbox"] {
+  min-height: 16px;
+}
+.ag-code-viewer .cm-search label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.ag-code-viewer .cm-search input:focus-visible,
+.ag-code-viewer .cm-search button:focus-visible {
+  outline: 2px solid var(--ag-accent);
+  outline-offset: 1px;
+}
+@media (forced-colors: active) {
+  .ag-code-viewer__action[aria-pressed="true"] {
+    outline: 1px solid ButtonText;
+  }
+}
+@media (pointer: coarse) {
+  .ag-code-viewer__action,
+  .ag-code-viewer .cm-search input:not([type="checkbox"]),
+  .ag-code-viewer .cm-search button,
+  .ag-code-viewer .cm-search label {
+    min-height: max(44px, var(--ag-control-height, 44px));
+    min-width: 44px;
+  }
+  .ag-code-viewer .cm-search label {
+    padding-inline: 6px;
+  }
+}
+
+/* External semantic theme is also the fallback when a host blocks runtime-injected style modules. */
+.ag-code-viewer .cm-editor {
+  color: var(--ag-text);
+  background: var(--ag-surface);
+  height: var(--ag-code-height);
+  font-size: inherit;
+}
+.ag-code-viewer .cm-editor .cm-scroller {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  overflow: auto;
+  line-height: 1.55;
+}
+.ag-code-viewer .cm-editor .cm-content {
+  padding: 12px 0;
+  caret-color: var(--ag-accent);
+}
+.ag-code-viewer .cm-editor .cm-line {
+  padding: 0 12px;
+}
+.ag-code-viewer .cm-editor .cm-gutters {
+  color: var(--ag-muted);
+  background: var(--ag-surface-alt);
+  border: 0;
+  min-width: 2.75em;
+}
+.ag-code-viewer .cm-editor .cm-gutterElement {
+  padding: 0 8px;
+}
+.ag-code-viewer .cm-editor.cm-focused {
+  outline: none;
+}
+.ag-code-viewer .cm-editor .cm-cursor,
+.ag-code-viewer .cm-editor .cm-dropCursor {
+  border-left-color: var(--ag-accent);
+}
+.ag-code-viewer .cm-editor .cm-panels {
+  color: var(--ag-text);
+  background: var(--ag-surface-alt);
+  border-color: var(--ag-border);
+}
+.ag-code-viewer .cm-selectionBackground,
+.ag-code-viewer .cm-editor.cm-focused .cm-selectionBackground,
+.ag-code-viewer .cm-editor .cm-content ::selection,
+.ag-code-viewer .cm-searchMatch,
+.ag-code-viewer .cm-editor .cm-searchMatch-selected {
+  background-color: color-mix(in srgb, var(--ag-accent) 4%, var(--ag-surface));
+}
+.ag-code-viewer .cm-editor .cm-searchMatch {
+  outline: 1px solid var(--ag-accent);
+}
+.ag-code-viewer .cm-editor .cm-searchMatch-selected {
+  outline: 2px solid var(--ag-accent);
+}
+.ag-code-viewer .ag-code-token-keyword {
+  color: var(--ag-code-keyword, var(--ag-accent));
+}
+.ag-code-viewer .ag-code-token-string {
+  color: var(--ag-code-string, var(--ag-success));
+}
+.ag-code-viewer .ag-code-token-literal {
+  color: var(--ag-code-literal, var(--ag-accent));
+}
+.ag-code-viewer .ag-code-token-comment {
+  color: var(--ag-code-comment, var(--ag-muted));
+}
+.ag-code-viewer .ag-code-token-type {
+  color: var(--ag-code-type, var(--ag-text));
+  font-weight: 600;
+}
+.ag-code-viewer .ag-code-token-property {
+  color: var(--ag-code-property, var(--ag-text));
+}
+.ag-code-viewer .ag-code-token-invalid {
+  color: var(--ag-danger);
+  text-decoration: underline;
+}
+
+.ag-code-viewer .cm-editor .cm-search input,
+.ag-code-viewer .cm-editor .cm-search button {
+  color: var(--ag-text);
+  background: var(--ag-surface);
+  border-color: var(--ag-border);
+}
+.ag-code-viewer .cm-editor .cm-search label {
+  font-size: inherit;
+}
+
+/* Compact presentation preserves the same native command targets and keyboard order. */
+.ag-code-viewer__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.ag-code-viewer[data-toolbar-mode="compact"] .ag-code-viewer__action {
+  min-width: 32px;
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+}
+.ag-code-viewer__action-icon {
+  display: inline-flex;
+  inline-size: 20px;
+  block-size: 20px;
+}
+.ag-code-viewer__action-icon svg {
+  inline-size: 100%;
+  block-size: 100%;
+}
+.ag-code-viewer__action-icon[hidden],
+.ag-code-viewer__action-label[hidden] {
+  display: none !important;
+}
+.ag-code-viewer__action[aria-pressed="true"] {
+  box-shadow: inset 0 -2px currentColor;
+}
+@media (pointer: coarse) {
+  .ag-code-viewer[data-toolbar-mode="compact"] .ag-code-viewer__action {
+    min-width: 44px;
+    width: 44px;
+    min-height: 44px;
+    height: 44px;
+  }
+}
+@media (forced-colors: active) {
+  .ag-code-viewer__action[aria-pressed="true"] {
+    border-block-end: 2px solid ButtonText;
+  }
+}
