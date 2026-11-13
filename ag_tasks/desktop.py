@@ -67,7 +67,8 @@ def run_desktop(app_factory, data_dir: Path, port: int = 8895, *, enable_automat
         data_dir.mkdir(parents=True, exist_ok=True)
         finished = threading.Event()
         origin = f"http://127.0.0.1:{listener.getsockname()[1]}"
-        config = uvicorn.Config(app_factory(data_dir=data_dir, origin=origin, **app_options), host="127.0.0.1", port=listener.getsockname()[1],
+        app = app_factory(data_dir=data_dir, origin=origin, **app_options)
+        config = uvicorn.Config(app, host="127.0.0.1", port=listener.getsockname()[1],
                                 timeout_graceful_shutdown=2, loop="asyncio", http="h11", ws="none", log_config=None, log_level="warning", access_log=False)
         server = uvicorn.Server(config)
     except BaseException:
@@ -85,7 +86,9 @@ def run_desktop(app_factory, data_dir: Path, port: int = 8895, *, enable_automat
     worker.start()
 
     def shutdown_owned_server():
-        """Request graceful lifespan cleanup with a bounded desktop wait; the watchdog handles stalls."""
+        """Close release prompts and request graceful cleanup within the watchdog deadline."""
+        if update_menu is not None:
+            update_menu.close()
         server.should_exit = True
         worker.join(SERVER_DRAIN_SECONDS)
         return not worker.is_alive()
@@ -93,6 +96,7 @@ def run_desktop(app_factory, data_dir: Path, port: int = 8895, *, enable_automat
     restore_shutdown = None
     presentation = None
     background = None
+    update_menu = None
     try:
         wait_started(server, finished)
         webview.settings["ALLOW_DOWNLOADS"] = False
@@ -102,7 +106,22 @@ def run_desktop(app_factory, data_dir: Path, port: int = 8895, *, enable_automat
             from .desktop_automation_host import NativeWindow
             automation.attach(NativeWindow(window, origin))
             window.events.closed += automation.detach
+        from . import __version__
+        from .desktop_update_menu import DesktopUpdateMenu
         from .native_menu import bind_native_shutdown, install_native_menu
+        from .release_updates import RELEASES_URL
+
+        def check_for_release():
+            """Use the running owner's release cache for an explicit native check."""
+            return app.state.release_updates.check(force=True)
+
+        update_menu = DesktopUpdateMenu(window, current_version=__version__, releases_url=RELEASES_URL,
+                                        fetch=check_for_release)
+        help_actions = (
+            ("Tasks Help", lambda: window.create_confirmation_dialog("Ag Tasks",
+                "Create issues, link evidence and register local repositories. Prepare an isolated branch and submit it for review; merging requires explicit user approval. Closing hides the window only when its tray is ready. Quit always stops this instance.")),
+            *update_menu.actions(),
+        )
         from .native_toolbar import bind_sidebar_presentation
         presentation = bind_sidebar_presentation(window, origin, sidebar_id="sidebar", right_class="", collapsed_class="sidebar-collapsed")
 
@@ -116,15 +135,13 @@ def run_desktop(app_factory, data_dir: Path, port: int = 8895, *, enable_automat
             if automation is not None:
                 from .desktop_mcp_menu import show_preference
                 view_actions.append(("Мост MCP…", lambda: show_preference(window, automation, data_dir)))
-            install_native_menu(window, "ag-tasks", sidebar_action=toggle_sidebar, view_actions=view_actions, help_actions=(
-                ("Tasks Help", lambda: window.create_confirmation_dialog("Ag Tasks",
-                    "Create issues, link evidence and register local repositories. Prepare an isolated branch and submit it for review; merging requires explicit user approval. Closing hides the window only when its tray is ready. Quit always stops this instance.")),
-            ))
+            install_native_menu(window, "ag-tasks", sidebar_action=toggle_sidebar, view_actions=view_actions,
+                                help_actions=help_actions)
             from .native_toolbar import install_native_toolbar
             install_native_toolbar(window, toggle_sidebar, identity="ag-tasks")
 
         def close_presentation():
-            """Dispose optional tray and sidebar handles once, before the native UI loop ends."""
+            """Dispose the tray and sidebar before the native UI loop ends."""
             try:
                 if background and not background.closed:
                     background.close()
@@ -135,12 +152,16 @@ def run_desktop(app_factory, data_dir: Path, port: int = 8895, *, enable_automat
         restore_shutdown = bind_native_shutdown(window, shutdown_owned_server, on_closed=close_presentation,
             hide_on_close=lambda: bool(background and background.hide_on_close()))
         from desktop_support import bind_background
-        from . import __version__
         background = bind_background(window, app_id='ag-tasks', title='ag-tasks', origin=origin,
             on_quit=restore_shutdown.request_quit, open_activity=lambda: window.load_url(origin + '/desktop-activity.html?desktop=1'),
-            data_directory=data_dir, current_version=__version__)
+            data_directory=data_dir, current_version=__version__, check_updates=update_menu.check)
         window.events.loaded += configure_menu
-        webview.start(gui={"darwin": "cocoa", "win32": "edgechromium"}.get(sys.platform, "qt"), debug=False, private_mode=False, storage_path=str(data_dir / "webview"))
+        start_options = {}
+        if sys.platform != "darwin":
+            from webview.menu import Menu, MenuAction
+            start_options["menu"] = [Menu("Справка", [MenuAction(*action) for action in help_actions])]
+        webview.start(gui={"darwin": "cocoa", "win32": "edgechromium"}.get(sys.platform, "qt"),
+                      debug=False, private_mode=False, storage_path=str(data_dir / "webview"), **start_options)
     finally:
         if automation is not None:
             automation.detach()

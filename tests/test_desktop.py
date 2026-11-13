@@ -89,6 +89,10 @@ def native_dependencies(monkeypatch):
     view = SimpleNamespace(settings={}, create_window=create_window, start=lambda **kwargs: None)
     monkeypatch.setitem(sys.modules, "uvicorn", SimpleNamespace(Config=lambda app, **kwargs: (app, kwargs), Server=create_server))
     monkeypatch.setitem(sys.modules, "webview", view)
+    monkeypatch.setitem(sys.modules, "webview.menu", SimpleNamespace(
+        Menu=lambda title, items: (title, items),
+        MenuAction=lambda label, callback: (label, callback),
+    ))
     return servers, windows
 
 
@@ -189,3 +193,87 @@ def test_restart_reuses_time_wait_but_never_a_live_listener():
         assert replacement.getsockname()[1] == port
     finally:
         replacement.close()
+
+
+@pytest.mark.parametrize(("platform", "renderer"), [
+    ("darwin", "cocoa"), ("win32", "edgechromium"), ("linux", "qt"),
+])
+def test_native_help_and_tray_share_installed_version_checker(monkeypatch, tmp_path, platform, renderer):
+    """Wire every supported native Help menu and the tray to one explicit release checker."""
+    from ag_tasks import desktop_update_menu, native_menu, native_toolbar
+
+    native_dependencies(monkeypatch)
+    monkeypatch.setattr(desktop, "sys", SimpleNamespace(platform=platform))
+    monkeypatch.setattr(desktop, "reserve_loopback", lambda _: Listener())
+    native_menus = []
+    starts = []
+    confirmations = []
+    checks = []
+    tray = []
+    windows = []
+    view = sys.modules["webview"]
+    fixture_window = view.create_window
+
+    def create_window(*args, **kwargs):
+        """Retain the owned window and record result prompts without rendering GUI."""
+        window = fixture_window(*args, **kwargs)
+        window.create_confirmation_dialog = lambda *message: confirmations.append(message)
+        windows.append(window)
+        return window
+
+    def start(**options):
+        """Fire the real launcher's loaded hook after menu setup."""
+        starts.append(options)
+        for handler in windows[0].events.loaded:
+            handler()
+        if platform != "darwin":
+            _, actions = options["menu"][0]
+            check_for_updates = dict(actions)["Проверить обновления…"]
+            check_for_updates()
+            tray[0]()
+
+    def bind_background(window, **options):
+        """Capture the injected updater while preserving the launcher close contract."""
+        tray.append(options["check_updates"])
+        return SimpleNamespace(closed=False, close=lambda: None)
+
+    def check(*, force=False):
+        """Record whether the native callback requested a manual refresh."""
+        checks.append(force)
+        return {"available": False, "version": "v0.8.3", "changelog": {"ru": [], "en": []}}
+
+    monkeypatch.setattr(view, "create_window", create_window)
+    monkeypatch.setattr(view, "start", start)
+    monkeypatch.setattr("desktop_support.bind_background", bind_background)
+    monkeypatch.setattr(native_toolbar, "install_native_toolbar", lambda *_, **__: None)
+    monkeypatch.setattr(native_toolbar, "bind_sidebar_presentation", lambda *_, **__: None)
+
+    def run_update_worker(*, target, **options):
+        """Run the separately unit-tested worker inline inside this wiring fixture."""
+        return SimpleNamespace(start=target)
+
+    monkeypatch.setattr(desktop_update_menu, "Thread", run_update_worker)
+
+    def verify_help(window, app_name, *, help_actions, **kwargs):
+        """Verify menu admission while the application owns its live server."""
+        if platform == "darwin":
+            native_menus.append(help_actions)
+            help_actions[1][1]()
+            tray[0]()
+
+    monkeypatch.setattr(native_menu, "install_native_menu", verify_help)
+    app = SimpleNamespace(state=SimpleNamespace(release_updates=SimpleNamespace(check=check)))
+    desktop.run_desktop(lambda **_: app, tmp_path)
+
+    expected = ["Tasks Help", "Проверить обновления…", "Релизы на GitHub"]
+    assert starts[0]["gui"] == renderer
+    if platform == "darwin":
+        assert [label for label, _ in native_menus[0]] == expected
+        assert "menu" not in starts[0]
+    else:
+        (title, actions), = starts[0]["menu"]
+        assert title == "Справка"
+        assert [label for label, _ in actions] == expected
+    assert checks == [True, True]
+    assert len(confirmations) == 2
+    assert "Более новой версии пока нет" in confirmations[0][1]

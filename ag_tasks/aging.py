@@ -2,6 +2,8 @@
 
 from datetime import datetime, timedelta, timezone
 
+from .review_queue import CURRENT_REVIEWS
+
 STALE_AFTER_DAYS = 3
 HOUSEKEEPING = ('storage_restored', 'storage_compressed', 'auto_stale', 'ancestor_stale',
                 'critic_superseded', 'work_expired', 'work_interrupted', 'project_space_moved')
@@ -49,7 +51,8 @@ class Aging:
     def sweep(self, *, now=None, limit=100):
         """Catch up at startup and each minute; a fresh/active descendant protects its plan.
 
-        At most 100 ordinary issues change per transaction. Generated critics are
+        Current reviews protect their producer and its ancestors. At most 100 ordinary
+        issues change per transaction. Generated critics are
         superseded with their producer, never independently expired or auto-approved.
         """
         if type(limit) is not int or not 1 <= limit <= 100:
@@ -58,19 +61,23 @@ class Aging:
         cutoff = (instant - timedelta(days=STALE_AFTER_DAYS)).isoformat()
         changed = []
         with self.store.db.transaction() as connection:
-            rows = connection.execute('''SELECT id,status,last_activity_at FROM issues
+            rows = connection.execute(f'''WITH current_reviews AS ({CURRENT_REVIEWS})
+                SELECT id,status,last_activity_at FROM issues
                 WHERE kind!='review' AND status NOT IN ('done','cancelled','stale')
                 AND archived_at IS NULL AND deleted_at IS NULL AND last_activity_at<=?
                 AND NOT EXISTS(WITH RECURSIVE tree(id) AS (
                     SELECT issues.id UNION SELECT c.id FROM issues c JOIN tree t ON c.parent_id=t.id
                     WHERE c.deleted_at IS NULL AND c.archived_at IS NULL)
                     SELECT 1 FROM issues child JOIN tree ON child.id=tree.id
-                    WHERE child.last_activity_at>? OR EXISTS(SELECT 1 FROM work_sessions w WHERE w.issue_id=child.id AND w.state='running'))
+                    WHERE child.last_activity_at>?
+                    OR EXISTS(SELECT 1 FROM work_sessions w WHERE w.issue_id=child.id AND w.state='running')
+                    OR EXISTS(SELECT 1 FROM current_reviews r WHERE r.producer_id=child.id))
                 ORDER BY last_activity_at,number LIMIT ?''', (cutoff, cutoff, limit)).fetchall()
             for row in rows:
                 self.store.results.supersede(connection, row['id'], 'inactivity', 0)
                 connection.execute("UPDATE issues SET status='stale',updated_at=? WHERE id=?", (instant.isoformat(), row['id']))
                 self.store._audit(connection, row['id'], 'auto_stale', 'system', {
-                    'previousStatus': row['status'], 'lastActivityAt': row['last_activity_at'], 'afterDays': STALE_AFTER_DAYS})
+                    'previousStatus': row['status'], 'lastActivityAt': row['last_activity_at'], 'afterDays': STALE_AFTER_DAYS,
+                    'fromStatus': row['status'], 'toStatus': 'stale', 'reason': 'inactivity'})
                 changed.append(row['id'])
         return changed

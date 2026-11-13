@@ -148,3 +148,35 @@ def test_superseded_claimed_review_requests_cancel_and_retains_reservation(store
     with pytest.raises(DomainError) as error:
         store.service.queue.worker.dispatch({'attemptId': attempt['id'], 'workerId': 'worker', 'workerEpoch': 'epoch', 'fence': attempt['fence']})
     assert error.value.code == 'dispatch_cancelled'
+
+
+def test_review_progress_stays_consistent_across_expiry_assignment_and_new_generation(store):
+    """Every UI view reads one reason and the same immutable result/review reference."""
+    result = submit(store)
+    producer, critic = result['id'], result['criticReviewId']
+
+    def progress(reason):
+        value = store.get(producer)['reviewProgress']
+        assert value == store.get(critic)['reviewProgress'] == store.reviews.list()['items'][0]['reviewProgress']
+        assert value['reason'] == reason
+        assert value['generation'] == result['resultGeneration']
+        assert value['nextAction']['issueId'] == critic
+        assert 'reviewProgress' not in store.list()[0]
+        return value
+
+    pending = progress('reviewer_required')
+    active = store.execution.start(critic, {'agentId': 'first', 'sessionKey': 'attempt'})
+    assert progress('active')['reviewerId'] == 'first'
+    assert store.reviews.metrics()['unassigned'] == 0
+    store.execution.ticks[active['work']['activeSession']['sessionId']] -= 91
+    assert progress('reviewer_required')['lastAttemptExpired']
+    assert store.reviews.metrics()['unassigned'] == 1
+    handoff = store.reviews.assign(critic, 'second')
+    assert progress('assigned')['waitingSince'] == pending['waitingSince']
+    store.reviews.release(critic, handoff['assignedAt'])
+    lane(store)
+    store.reviews.assign(critic, 'third', 'reviews')
+    assert progress('queued')['lastAttemptExpired']
+    updated = submit(store, result, key='fresh')
+    assert store.get(critic)['reviewProgress'] is None
+    assert store.reviews.list()['items'][0]['id'] == updated['criticReviewId']

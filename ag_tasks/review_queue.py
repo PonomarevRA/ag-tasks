@@ -1,8 +1,21 @@
 """Current independent review inbox and explicit, durable worker handoff."""
 
+from datetime import datetime, timezone
 import json
 
 from .issues import DomainError, bounded_text, timestamp
+
+
+# One predicate for inbox visibility, detail and inactivity protection.
+CURRENT_REVIEWS = """SELECT c.id AS critic_id,p.id AS producer_id,p.space_id,c.number,
+        r.created_at AS waiting_since,p.result_generation,p.definition_revision
+    FROM issues c JOIN issues p ON p.critic_review_id=c.id
+    JOIN results r ON r.issue_id=p.id AND r.generation=p.result_generation
+    WHERE p.status='in_review' AND c.status NOT IN ('done','cancelled','stale')
+    AND p.archived_at IS NULL AND p.deleted_at IS NULL AND c.archived_at IS NULL AND c.deleted_at IS NULL
+    AND r.definition_revision=p.definition_revision AND r.reviewed_head IS p.reviewed_head
+    AND r.producer_session_id=(SELECT CASE WHEN state!='running' THEN id END
+        FROM work_sessions WHERE issue_id=p.id ORDER BY rowid DESC LIMIT 1)"""
 
 
 def migrate(connection):
@@ -14,6 +27,19 @@ def migrate(connection):
             critic_id TEXT PRIMARY KEY REFERENCES issues(id),reviewer_id TEXT NOT NULL,lane_id TEXT,
             queue_item_id TEXT,assigned_at TEXT NOT NULL);
     ''')
+
+
+def handoff(connection, critic_id):
+    """Expose missing routing honestly; a durable queue ACK is distinct from worker execution."""
+    row = connection.execute('SELECT h.*,q.state AS queue_state FROM review_handoffs h LEFT JOIN agent_queue_items q ON q.id=h.queue_item_id WHERE h.critic_id=?', (critic_id,)).fetchone()
+    if row is None:
+        return {'state': 'reviewer_required', 'reviewerId': None, 'laneId': None, 'queueItemId': None, 'assignedAt': None, 'automaticLaunch': False}
+    state = 'assigned'
+    if row['queue_item_id']:
+        state = 'queued' if row['queue_state'] == 'queued' else 'inspect_worker'
+    return {'state': state, 'reviewerId': row['reviewer_id'], 'laneId': row['lane_id'],
+            'queueItemId': row['queue_item_id'], 'assignedAt': row['assigned_at'], 'automaticLaunch': False}
+
 
 
 class ReviewQueue:
@@ -29,38 +55,71 @@ class ReviewQueue:
             raise DomainError('invalid_page', 'Invalid review inbox page.')
         with self.store.db.lock:
             self.store.execution.expire_all()
-            clause, parameters = (' AND p.space_id=?', [space_id]) if space_id is not None else ('', [])
-            rows = self.store.db.connection.execute('''SELECT c.id,p.id AS producer_id FROM issues c
-                JOIN issues p ON p.critic_review_id=c.id
-                JOIN results r ON r.issue_id=p.id AND r.generation=p.result_generation
-                WHERE p.status='in_review' AND c.status NOT IN ('done','cancelled','stale')
-                AND p.archived_at IS NULL AND p.deleted_at IS NULL AND c.archived_at IS NULL AND c.deleted_at IS NULL
-                AND r.definition_revision=p.definition_revision AND r.reviewed_head IS p.reviewed_head
-                AND r.producer_session_id=(SELECT id FROM work_sessions WHERE issue_id=p.id ORDER BY rowid DESC LIMIT 1)
-                ''' + clause + ' ORDER BY c.created_at,c.number LIMIT ? OFFSET ?', (*parameters, limit + 1, offset)).fetchall()
+            clause, parameters = (' WHERE space_id=?', [space_id]) if space_id is not None else ('', [])
+            rows = self.store.db.connection.execute(f"""WITH current_reviews AS ({CURRENT_REVIEWS})
+                SELECT * FROM current_reviews {clause}
+                ORDER BY waiting_since,number LIMIT ? OFFSET ?""", (*parameters, limit + 1, offset)).fetchall()
             items = []
             for row in rows[:limit]:
-                issue = self.store._issue(self.store._row(row['id']), compact=True)
+                issue = self.store._issue(self.store._row(row['critic_id']), compact=True)
                 parent = self.store._row(row['producer_id'])
                 from .prefixes import issue_key
                 issue['reviewTarget'] = {'id': parent['id'], 'key': issue_key(self.store.db.connection, parent),
                     'title': parent['title'], 'generation': parent['result_generation'], 'definitionRevision': parent['definition_revision'], 'reviewedHead': parent['reviewed_head']}
-                issue['handoff'] = self.handoff(row['id'])
+                issue['handoff'] = self.handoff(row['critic_id'])
+                issue['reviewProgress'] = self.progress(row, issue['handoff'])
                 items.append(issue)
             return {'items': items, 'hasMore': len(rows) > limit, 'nextOffset': offset + len(items) if len(rows) > limit else None,
                     'automaticLaunch': False, 'order': 'oldest_first'}
 
-    def handoff(self, critic_id):
-        """Expose missing routing honestly; a durable queue ACK is distinct from worker execution."""
+    def metrics(self, *, space_id=None):
+        """Count current reviews and the age of the oldest without a page-sized approximation."""
+        with self.store.db.lock:
+            self.store.execution.expire_all()
+            row = self.store.db.connection.execute(f"""WITH current_reviews AS ({CURRENT_REVIEWS})
+                SELECT COUNT(*) AS total, MIN(r.waiting_since) AS oldest,
+                    COUNT(CASE WHEN h.critic_id IS NULL AND NOT EXISTS(
+                        SELECT 1 FROM work_sessions w WHERE w.issue_id=r.critic_id AND w.state='running'
+                    ) THEN 1 END) AS unassigned
+                FROM current_reviews r LEFT JOIN review_handoffs h ON h.critic_id=r.critic_id
+                WHERE (? IS NULL OR r.space_id=?)""", (space_id, space_id)).fetchone()
+            oldest = datetime.fromisoformat(row['oldest']) if row['oldest'] else None
+        return {'pending': row['total'], 'unassigned': row['unassigned'],
+                'unassignedFraction': row['unassigned'] / row['total'] if row['total'] else None,
+                'oldestWaitingSince': row['oldest'],
+                'oldestWaitingSeconds': max(0, int((datetime.now(timezone.utc) - oldest).total_seconds())) if oldest else None}
+
+    def for_issue(self, identifier):
+        """Find only the current review for a producer or its generated critic."""
+        row = self.store.db.connection.execute(f"""SELECT * FROM ({CURRENT_REVIEWS})
+            WHERE producer_id=? OR critic_id=? LIMIT 1""", (identifier, identifier)).fetchone()
+        return self.progress(row, self.handoff(row['critic_id'])) if row else None
+
+    def progress(self, review, handoff):
+        """Project review ownership and past expiry independently of current dispatch."""
+        from .prefixes import issue_key
+
         connection = self.store.db.connection
-        row = connection.execute('SELECT h.*,q.state AS queue_state FROM review_handoffs h LEFT JOIN agent_queue_items q ON q.id=h.queue_item_id WHERE h.critic_id=?', (critic_id,)).fetchone()
-        if row is None:
-            return {'state': 'reviewer_required', 'reviewerId': None, 'laneId': None, 'queueItemId': None, 'assignedAt': None, 'automaticLaunch': False}
-        state = 'assigned'
-        if row['queue_item_id']:
-            state = 'queued' if row['queue_state'] == 'queued' else 'inspect_worker'
-        return {'state': state, 'reviewerId': row['reviewer_id'], 'laneId': row['lane_id'],
-                'queueItemId': row['queue_item_id'], 'assignedAt': row['assigned_at'], 'automaticLaunch': False}
+        critic_id = review['critic_id']
+        critic = self.store._row(critic_id)
+        last = connection.execute(
+            'SELECT * FROM work_sessions WHERE issue_id=? ORDER BY rowid DESC LIMIT 1', (critic_id,)).fetchone()
+        running = last and last['state'] == 'running' and not self.store.execution._expired(last)
+        expired = bool(last and (last['state'] == 'expired' or (last['state'] == 'running' and not running)))
+        return {
+            'reason': 'active' if running else handoff['state'],
+            'waitingSince': review['waiting_since'],
+            'reviewerId': last['agent_id'] if running else handoff['reviewerId'],
+            'lastAttemptExpired': expired,
+            'lastAttemptEndedAt': last['lease_expires_at'] if expired else None,
+            'generation': review['result_generation'],
+            'definitionRevision': review['definition_revision'],
+            'nextAction': {'kind': 'open_critic', 'issueId': critic_id, 'key': issue_key(connection, critic)},
+        }
+
+    def handoff(self, critic_id):
+        """Read current assignment without inferring a worker launch."""
+        return handoff(self.store.db.connection, critic_id)
 
     def assign(self, critic_id, reviewer_id, lane_id=None):
         """Assign once to a distinct declared reviewer; exact retry never duplicates queued work."""
@@ -95,7 +154,9 @@ class ReviewQueue:
                 queue_id = item['id']
             connection.execute('INSERT INTO review_handoffs VALUES(?,?,?,?,?)', (critic['id'], reviewer, lane_id, queue_id, timestamp()))
             connection.execute('UPDATE issues SET assignee=? WHERE id=?', (reviewer, critic['id']))
-            self.store._audit(connection, critic['id'], 'review_assigned', 'user', {'reviewerId': reviewer, 'laneId': lane_id, 'queueItemId': queue_id})
+            self.store._audit(connection, critic['id'], 'review_assigned', 'user', {'reviewerId': reviewer, 'laneId': lane_id, 'queueItemId': queue_id,
+                'parentId': parent['id'], 'criticReviewId': critic['id'], 'generation': current['generation'],
+                'definitionRevision': current['definition_revision'], 'assignmentState': 'queued' if queue_id else 'assigned'})
         return self.handoff(critic['id'])
 
     def release(self, critic_id, expected_assigned_at):
@@ -114,7 +175,8 @@ class ReviewQueue:
             self.cancel_waiting(connection, critic['id'])
             connection.execute('DELETE FROM review_handoffs WHERE critic_id=?', (critic['id'],))
             connection.execute('UPDATE issues SET assignee=NULL WHERE id=?', (critic['id'],))
-            self.store._audit(connection, critic['id'], 'review_assignment_released', 'user', {'assignedAt': expected_assigned_at})
+            self.store._audit(connection, critic['id'], 'review_assignment_released', 'user', {'assignedAt': expected_assigned_at,
+                'parentId': critic['parent_id'], 'criticReviewId': critic['id'], 'assignmentState': 'reviewer_required'})
         return self.handoff(critic['id'])
 
     def configure(self, space_id, reviewer_id, lane_id=None):
@@ -136,7 +198,8 @@ class ReviewQueue:
                 self.assign(critic_id, row['reviewer_id'], row['lane_id'])
             except DomainError as error:
                 # A full lane or misconfigured identity must not discard checked producer work.
-                self.store._audit(self.store.db.connection, critic_id, 'review_handoff_failed', 'system', {'code': error.code})
+                self.store._audit(self.store.db.connection, critic_id, 'review_handoff_failed', 'system', {'code': error.code,
+                    'reason': error.code, 'parentId': parent['id'], 'criticReviewId': critic_id, 'assignmentState': 'reviewer_required'})
 
     def cancel_waiting(self, connection, critic_id):
         """Cancel obsolete handoffs, fencing claimed dispatch while retaining every active reservation."""

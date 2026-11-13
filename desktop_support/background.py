@@ -12,7 +12,7 @@ from .updates import check_release
 
 class BackgroundHandle:
     """Hide only after native registration succeeds; explicit Quit bypasses this policy."""
-    def __init__(self, window, app_id, title, origin, on_quit, open_activity, data_directory, current_version):
+    def __init__(self, window, app_id, title, origin, on_quit, open_activity, data_directory, current_version, check_updates=None):
         """Retain native objects and callbacks for exactly one desktop owner."""
         self.window, self.app_id, self.title = window, app_id, title
         self.origin, self.on_quit, self.open_activity = origin, on_quit, open_activity
@@ -21,6 +21,7 @@ class BackgroundHandle:
         self.settings = read_installation(app_id, data_directory or Path.home() / '.local/share' / app_id)
         self.data_directory = Path(data_directory) if data_directory is not None else self.settings.data_directory
         self.current_version = current_version
+        self.check_updates = check_updates
         self.update_lock = Lock()
         self.installing = False
         self.dispatch = lambda callback: callback()
@@ -60,6 +61,9 @@ class BackgroundHandle:
 
     def updates(self):
         """Fetch metadata off the GUI thread and ask before opening an official installer page."""
+        if self.check_updates is not None:
+            self.check_updates()
+            return
         if not self.update_lock.acquire(blocking=False):
             return
         def check():
@@ -97,6 +101,6 @@ class BackgroundHandle:
             self.dispatch(self.native.close)
 
 
-def bind_background(window, *, app_id, title, origin, on_quit, open_activity=None, data_directory=None, current_version="0.1.0"):
+def bind_background(window, *, app_id, title, origin, on_quit, open_activity=None, data_directory=None, current_version="0.1.0", check_updates=None):
     """Return an immediately usable lifecycle hook; native readiness follows the shown event."""
-    return BackgroundHandle(window, app_id, title, origin, on_quit, open_activity, data_directory, current_version)
+    return BackgroundHandle(window, app_id, title, origin, on_quit, open_activity, data_directory, current_version, check_updates)

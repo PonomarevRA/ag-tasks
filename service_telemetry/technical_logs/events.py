@@ -10,13 +10,14 @@ from uuid import uuid4
 
 CORRELATION = ("traceId", "spanId", "operationId", "sessionId", "taskId")
 context_fields = ContextVar("ag-tasks_technical_log_context", default=None)
-SENSITIVE = re.compile(r"password|passwd|secret|token|authorization|cookie|credential|apikey|api_key|body|headers|actor|scope", re.I)
-ASSIGNMENT = re.compile(r"(?i)\b(password|passwd|secret|token|api[_-]?key|authorization|cookie)\s*[:=]\s*(?:\"[^\"]*\"|'[^']*'|[^\s,;]+)")
+SENSITIVE = re.compile(r"password|passwd|secret|token|authorization|cookie|credential|apikey|api_key|session[_-]?key|body|headers|actor|scope", re.I)
+ASSIGNMENT = re.compile(r"(?i)\b(password|passwd|secret|token|api[_-]?key|session[_-]?key|authorization|cookie)\s*[:=]\s*(?:\"[^\"]*\"|'[^']*'|[^\s,;]+)")
 BEARER = re.compile(r"(?i)\b(Bearer|Basic)\s+[A-Za-z0-9._~+/=-]+")
 URL_CREDENTIAL = re.compile(r"(https?://)[^\s/@:]+:[^\s/@]+@", re.I)
 FORMAT = re.compile(r"%(?:\([^)]+\))?[-+#0 ]*(\*|[0-9]+)?(?:\.(\*|[0-9]+))?[hlL]?[diouxXeEfFgGcrsa%]")
 DIAGNOSTIC_KEYS = {"durationMs", "elapsedMs", "resultCount", "count", "statusCode", "errorCode", "retryCount",
-                   "attempt", "queueItems", "queueBytes", "sizeBytes", "bytes", "component", "phase", "status"}
+                   "attempt", "queueItems", "queueBytes", "sizeBytes", "bytes", "component", "phase", "status",
+                   "agentId", "identityQuality", "presenceState"}
 
 
 def utc_now():

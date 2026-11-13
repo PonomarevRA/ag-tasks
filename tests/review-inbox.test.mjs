@@ -16,14 +16,15 @@ test('current review shows owner, age, target and an explicit assignment without
   const {dom, container} = root(t);
   const calls = [], opens = [];
   const issue = {id:'critic',key:'AGT-2',title:'Review <img onerror=x>',status:'ready',kind:'review',createdAt:'2026-10-22T12:00:00Z',
-    lifecycle:{phase:'review_pending',needsAttention:true},handoff:{state:'reviewer_required'},reviewTarget:{id:'producer',key:'AGT-1',generation:2}};
+    lifecycle:{phase:'review_pending',needsAttention:true},handoff:{state:'reviewer_required'},reviewProgress:{reason:'reviewer_required',waitingSince:'2026-10-22T12:00:00Z',lastAttemptExpired:true},reviewTarget:{id:'producer',key:'AGT-1',generation:2}};
   const dispose = renderReviewInbox(container,[issue],{spaceId:'default',onOpen:id=>opens.push(id),onRefresh:async()=>{},
     request:async(path,method='GET',body)=>{calls.push({path,method,body});return{items:[]};}});
   t.after(dispose);
   await Promise.resolve();
   assert.equal(calls.filter(x=>x.method==='POST').length,0);
-  assert.match(container.textContent,/Рецензент: не назначен/);
-  assert.match(container.textContent,/Ожидание:/);
+  assert.match(container.textContent,/Рецензент не назначен/);
+  assert.match(container.textContent,/Ожидание с момента сдачи:/);
+  assert.match(container.textContent,/Аренда последней сессии критика истекла/);
   assert.equal(container.querySelectorAll('img').length,0);
   [...container.querySelectorAll('button')].find(b=>b.textContent.includes('Результат AGT-1')).click();
   await Promise.resolve();
@@ -39,7 +40,7 @@ test('current review shows owner, age, target and an explicit assignment without
 test('failed assignment retains entered identity and surfaces recovery; disposed queue load has no effects', async t => {
   const {container} = root(t);
   let resolveQueues;
-  const dispose=renderReviewInbox(container,[{id:'critic',key:'AGT-2',title:'Review',kind:'review',status:'ready',handoff:{state:'reviewer_required'}}],{
+  const dispose=renderReviewInbox(container,[{id:'critic',key:'AGT-2',title:'Review',kind:'review',status:'ready',handoff:{state:'reviewer_required'},reviewProgress:{reason:'reviewer_required',waitingSince:'2026-10-22T12:00:00Z',lastAttemptExpired:true}}],{
     spaceId:'default',onOpen:()=>{},onRefresh:async()=>assert.fail('failed assignment cannot refresh'),
     request:(path,method='GET')=>method==='GET'?new Promise(resolve=>{resolveQueues=resolve;}):Promise.reject(new Error('Assignment unavailable'))});
   container.querySelector('input').value='critic';

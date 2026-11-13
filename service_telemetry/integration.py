@@ -1,9 +1,12 @@
 """Compose independent journals and capture bounded HTTP metadata without polling feedback."""
 
 import asyncio
+from contextvars import ContextVar
+from datetime import datetime
 import json
 import logging
 import time
+from threading import Lock
 from urllib.parse import parse_qs
 from uuid import uuid4
 
@@ -12,11 +15,29 @@ from .agent_activity.http_api import register_http_activity_routes
 from .technical_logs.service import TechnicalJournal, TechnicalHandler
 from .technical_logs.http_api import register_technical_routes
 from .technical_logs.metrics import register_diagnostics_routes
-from .technical_logs.events import safe_text, utc_now
+from .technical_logs.events import log_context, safe_text, utc_now
 
 CAPTURE_BYTES = 8192
 POLL_PATHS = {'/api/v1/status', '/api/v1/ui-session'}
-SENSITIVE = ('password', 'secret', 'token', 'authorization', 'cookie', 'credential', 'api_key', 'apikey')
+SENSITIVE = ('password', 'secret', 'token', 'authorization', 'cookie', 'credential', 'apikey', 'sessionkey', 'connectionid')
+
+
+request_scope = ContextVar('telemetry_http_scope', default=None)
+PRESENCE_ROUTE = '/api/v1/agent/sessions/{session_id}/presence'
+
+
+def request_diagnostics(**fields):
+    """Carry validated product metadata back across the async request's worker boundary."""
+    scope = request_scope.get()
+    if scope is not None:
+        scope.setdefault('execution_diagnostics', {}).update(fields)
+
+
+def resolved_task(requested, canonical):
+    """Attribute the primary path target only after it has resolved in domain storage."""
+    scope = request_scope.get()
+    if scope and scope.get('path_params', {}).get('identifier') == requested:
+        request_diagnostics(taskId=canonical)
 
 
 def summary(raw):
@@ -28,7 +49,7 @@ def summary(raw):
     result = {}
     if isinstance(value, dict):
         for name, item in list(value.items())[:12]:
-            if any(word in name.lower() for word in SENSITIVE):
+            if any(word in name.lower().replace('-', '').replace('_', '') for word in SENSITIVE):
                 result[name] = '[REDACTED]'
             elif isinstance(item, (str, int, float, bool)) or item is None:
                 result[name] = safe_text(item, 128) if isinstance(item, str) else item
@@ -64,6 +85,8 @@ class Telemetry:
         self.activity = ActivityJournal(directory)
         self.technical = TechnicalJournal(directory)
         self.session = uuid4().hex
+        self.presence_lock = Lock()
+        self.presence_pulses = 0
         # Keep existing root level; error capture must not turn httpx polling into INFO feedback.
         handler = TechnicalHandler(self.technical)
         logger = logging.getLogger()
@@ -74,22 +97,70 @@ class Telemetry:
         """Drain both bounded writers concurrently off the UI loop, retaining each owned lock."""
         await asyncio.gather(asyncio.to_thread(self.activity.close), asyncio.to_thread(self.technical.close))
 
+    def coverage(self):
+        """Measure the observed window of each persisted journal at its current sequence bounds."""
+        result = {}
+        for name, journal in (('activity', self.activity), ('technical', self.technical)):
+            window = {'oldestAt': None, 'latestAt': None, 'coverageSeconds': None}
+            result[name] = window
+            if journal.disk is None:
+                continue
+            try:
+                with journal.disk.lock:
+                    oldest, latest = journal.disk.bounds()
+                    if oldest > latest:
+                        continue
+                    first = journal.disk.read(after=oldest - 1, limit=1)[0]['occurredAt']
+                    last = journal.disk.read(before=latest + 1, limit=1)[0]['occurredAt']
+                age = int((datetime.fromisoformat(last) - datetime.fromisoformat(first)).total_seconds())
+                window.update(oldestAt=first, latestAt=last, coverageSeconds=max(0, age))
+            except (OSError, ValueError, IndexError, KeyError):
+                # A missing or unreadable window is unknown, not evidence of an empty journal.
+                continue
+        return result
+
+    def record_presence_expired(self, session_id):
+        """Record an observed lease transition without inventing an HTTP request or an agent action."""
+        record = logging.LogRecord(self.application + '.presence', logging.INFO, '', 0,
+                                   'MCP connection presence lease expired', (), None)
+        record.eventName = 'connection.presence.expired'
+        record.sessionId = session_id
+        record.properties = {'presenceState': 'stale'}
+        self.technical.submit(record)
+
     def record(self, scope, request_body, response_body, status, duration):
         """Emit one completed operation and correlated technical record with safe route summaries."""
         route = getattr(scope.get('route'), 'path', '/api/v1/unmatched')
         operation = f"{scope['method']} {route}"[:128]
-        operation_id = uuid4().hex
-        request = summary(request_body) if request_body else {'summary': operation, 'truncated': False}
+        operation_id = scope['telemetry_operation_id']
+        facts = scope.get('execution_diagnostics', {})
+        presence = route == PRESENCE_ROUTE
+        if presence and status < 400 and facts.get('presenceWasStale'):
+            self.record_presence_expired(facts['sessionId'])
+        if presence and status < 400 and facts.get('presenceState') == 'unchanged':
+            with self.presence_lock:
+                self.presence_pulses += 1
+            return
+        execution = '/issues/{identifier}/' in route and route.endswith((
+            '/work/start', '/work/heartbeat', '/work/stop', '/results', '/review-report',
+            '/review-assignment', '/review-assignment/release', '/execution-diagnostics'))
+        request = {'summary': operation, 'truncated': False}
+        if request_body and not (presence or execution):
+            request = summary(request_body)
         # Query values can contain private input; keep only a bounded safe allowlist of useful filters.
         query = parse_qs(scope.get('query_string', b'')[:4096].decode('utf-8', 'replace'))
         filters = {}
         for key in ('query', 'q', 'category', 'tag', 'component_id', 'status', 'spaceId', 'taskId', 'limit'):
             if key in query:
                 filters[key] = safe_text(query[key][0], 128)
-        if filters:
+        if filters and not (presence or execution):
             request = summary(json.dumps(filters).encode())
-        response = summary(response_body)
-        response['summary'] = f"HTTP {status} · {response['summary']}"[:512]
+        if presence or execution:
+            error_code = facts.get('errorCode')
+            response = {'summary': f'HTTP {status}' + (f' · {error_code}' if error_code else ''), 'truncated': False}
+        else:
+            response = summary(response_body)
+            response['summary'] = f"HTTP {status} · {response['summary']}"[:512]
         event = {'schemaVersion': 'agent-activity/v1', 'application': self.application,
                  'eventId': uuid4().hex, 'occurredAt': utc_now(), 'source': 'http', 'clientKind': 'http',
                  'identityQuality': 'process', 'sessionId': self.session, 'agentId': None,
@@ -100,8 +171,12 @@ class Telemetry:
         record = logging.LogRecord(self.application + '.http', logging.ERROR if status >= 500 else logging.WARNING if status >= 400 else logging.INFO,
                                    '', 0, '%s returned HTTP %s', (operation, status), None)
         record.eventName = 'http.request.completed'
-        record.operationId, record.sessionId = operation_id, self.session
-        record.properties = {'durationMs': duration, 'statusCode': status}
+        record.operationId, record.sessionId = operation_id, facts.get('sessionId', self.session)
+        record.taskId = facts.get('taskId')
+        record.properties = {'durationMs': duration, 'statusCode': status,
+                             **{key: facts[key] for key in ('errorCode', 'agentId', 'presenceState') if key in facts}}
+        if 'agentId' in facts:
+            record.properties['identityQuality'] = 'declared'
         self.technical.submit(record)
 
 
@@ -135,9 +210,13 @@ class TelemetryMiddleware:
                 response_body.extend(message.get('body', b'')[:max(0, CAPTURE_BYTES - len(response_body))])
             await send(message)
 
+        scope['telemetry_operation_id'] = operation_id = uuid4().hex
+        token = request_scope.set(scope)
         try:
-            await self.app(scope, capture_receive, capture_send)
+            with log_context(operationId=operation_id):
+                await self.app(scope, capture_receive, capture_send)
         finally:
+            request_scope.reset(token)
             owner = self.owner()
             if owner is not None:
                 # Logging failure may degrade observability, never the application response.

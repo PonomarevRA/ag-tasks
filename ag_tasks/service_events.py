@@ -78,13 +78,26 @@ class SessionEvents:
                 raise DomainError('invalid_presence', 'Only a registered MCP connection can report presence.')
             if payload['connectionId'] != session['connection_id']:
                 raise DomainError('connection_conflict', 'Presence must match its registered connection.', 409)
+            if payload['state'] not in ('connected', 'disconnected'):
+                raise DomainError('invalid_presence', 'Use connected or disconnected presence.')
+            expired = self.presence.expire(session_id)
+            previous = self.presence.snapshot(session_id)['state']
             result = self.presence.touch(session_id, payload['state'])
+            from service_telemetry.integration import request_diagnostics
+            state = 'unchanged' if previous == result['state'] else result['state']
+            request_diagnostics(sessionId=session['id'], taskId=session['issue_id'], presenceState=state,
+                                presenceWasStale=bool(expired))
             now = datetime.now(timezone.utc)
             stale_metadata = datetime.fromisoformat(session['updated_at']) <= now - timedelta(minutes=1)
             if (result['state'] == 'connected' and stale_metadata) or payload['state'] == 'disconnected':
                 self.db.connection.execute('UPDATE service_sessions SET updated_at=? WHERE id=?',
                                            (now.isoformat(), session_id))
             return result
+
+    def expire_presence(self):
+        """Serialize maintenance detection with the observation update for each connection."""
+        with self.db.lock:
+            return self.presence.expire()
 
     def link(self, payload):
         """Change only the task association against an explicit revision, never execution ownership."""

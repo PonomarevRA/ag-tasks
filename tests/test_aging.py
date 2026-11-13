@@ -58,17 +58,19 @@ def test_active_or_recent_child_protects_old_parent_and_terminal_records(store):
     assert store.aging.sweep() == []
 
 
-def test_pending_result_expires_with_critic_and_retains_evidence(store):
-    issue = store.create({'title': 'Pending', **metadata()})
+def test_pending_result_and_ancestors_stay_actionable(store):
+    plan = store.create({'title': 'Plan', 'kind': 'rnd'})
+    issue = store.create({'title': 'Pending', 'parentId': plan['id'], **metadata()})
     active = store.execution.start(issue['id'], {'agentId': 'producer', 'sessionKey': 'work'})
     result = store.results.submit(issue['id'], {'agentId': 'producer', 'sessionKey': 'work', 'sessionId': active['work']['activeSession']['sessionId'],
         'result': {'summary': 'Done by author', 'changes': ['change'], 'validation': ['check'], 'limitations': '', 'artifacts': []}})
     age(store, issue['id'])
     age(store, result['criticReviewId'])
-    assert store.aging.sweep() == [issue['id']]
-    assert store.get(result['criticReviewId'])['status'] == 'cancelled'
+    age(store, plan['id'])
+    assert store.aging.sweep() == []
+    assert store.reviews.list()['items'][0]['id'] == result['criticReviewId']
     saved = store.get(issue['id'])
-    assert saved['status'] == 'stale' and saved['currentResult']['summary'] == 'Done by author'
+    assert saved['status'] == 'in_review' and saved['currentResult']['summary'] == 'Done by author'
     assert saved['resultsCount'] == 1
 
 
@@ -114,3 +116,15 @@ def test_batch_bound_and_no_housekeeping_activity(store):
     assert len(store.aging.sweep(limit=2)) == 2
     assert len(store.aging.sweep(limit=2)) == 2
     assert store.aging.sweep() == []
+
+
+def test_archived_stale_child_remains_reachable_from_plan(store):
+    """An archived child that still blocks completion is the actual next navigation target."""
+    plan = store.create({'title': 'Plan', 'kind': 'rnd'})
+    child = store.create({'title': 'Child', 'parentId': plan['id']})
+    age(store, child['id'])
+    assert store.aging.sweep() == [child['id']]
+    store.spaces.archive(child['id'])
+    detail = store.get(plan['id'])
+    assert detail['lifecycle']['phase'] == 'children_need_attention'
+    assert detail['attentionChild'] == {'id': child['id'], 'key': child['key']}

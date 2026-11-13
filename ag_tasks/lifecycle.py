@@ -89,3 +89,21 @@ def child_progress(connection, rows):
     for child in children:
         progress.setdefault(child['parent_id'], {})[child['status']] = child['amount']
     return progress
+
+
+def attention_child(connection, issue_id, phase_name):
+    """Choose an actual child from the phase's blocking statuses, independently of page size."""
+    statuses = {
+        'children_need_attention': ('blocked', 'rework', 'stale'),
+        'children_review': ('in_review',),
+        'children_pending': ('ready', 'backlog'),
+        'children_working': ('in_progress',),
+    }.get(phase_name)
+    if statuses is None:
+        return None
+    from .prefixes import issue_key
+    placeholders = ','.join('?' for _ in statuses)
+    row = connection.execute(f"""SELECT * FROM issues WHERE parent_id=? AND kind!='review'
+        AND deleted_at IS NULL AND status IN ({placeholders})
+        ORDER BY created_at,number LIMIT 1""", (issue_id, *statuses)).fetchone()
+    return {'id': row['id'], 'key': issue_key(connection, row)} if row else None

@@ -76,7 +76,7 @@ export function renderTaskGraph(container, graph, options) {
         columns.set(entry.depth, column);
       }
       const issue = entry.issue;
-      const card = button(issue.title, () => options.onOpen(issue.id), 'task-graph-card');
+      const card = button(issue.title, () => { void options.onOpen(issue.id, card); }, 'task-graph-card');
       card.replaceChildren(element('span', issue.key, 'key'), element('strong', issue.title));
       card.setAttribute('aria-label', `${issue.key}: ${issue.title}`);
       card.dataset.issueId = issue.id;

@@ -72,7 +72,7 @@ def invalidate_ancestors(store, connection, issue, reason):
 def _finish(store, connection, issue, basis):
     """Record the completion basis without fabricating a producer result, critic vote, historical time or merge."""
     connection.execute("UPDATE issues SET status='done',updated_at=? WHERE id=?", (timestamp(), issue['id']))
-    store._audit(connection, issue['id'], 'auto_completed', 'system', {'basis':basis, 'generation':issue['result_generation'], 'definitionRevision':issue['definition_revision'], 'mergeApproved':False})
+    store._audit(connection, issue['id'], 'auto_completed', 'system', {'basis':basis, 'generation':issue['result_generation'], 'definitionRevision':issue['definition_revision'], 'mergeApproved':False, 'fromStatus':issue['status'], 'toStatus':'done', 'reason':basis})
 
 
 def migrate(connection):

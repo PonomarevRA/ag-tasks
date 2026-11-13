@@ -68,6 +68,13 @@ def register(app, store, object_body):
         """Read real dependencies, optionally selecting live work before the page limit."""
         return JSONResponse(store.spaces.graph(spaceId, limit, active_only=activeOnly))
 
+    @app.get('/api/v1/issues/{identifier}/execution-diagnostics')
+    def execution_diagnostics(identifier: str, limit: int = Query(default=20, ge=1, le=100),
+                              before: int | None = Query(default=None, ge=1, le=2**63-1)):
+        """Read bounded, committed diagnostics for the producer and its generated reviews."""
+        from .execution_diagnostics import read
+        return read(store, identifier, limit=limit, before=before)
+
     @app.get('/api/v1/issues/{identifier}/work/history')
     def work_history(identifier: str, limit: int = Query(default=20, ge=1, le=100), offset: int = Query(default=0, ge=0)):
         """Read captured session roles and durations; history never starts or renews work."""
@@ -107,7 +114,14 @@ def register(app, store, object_body):
     async def report(identifier: str, request: Request):
         """Record a distinct declared critic's exact-generation report without granting merge approval."""
         fields = {'agentId', 'sessionId', 'sessionKey', 'generation', 'definitionRevision', 'reviewedHead', 'verdict', 'summary', 'findings', 'evidence'}
-        return await asyncio.to_thread(store.results.report, identifier, await object_body(request, fields, fields), actor(request))
+        value = await object_body(request, fields, fields)
+        source = actor(request)
+        result = await asyncio.to_thread(store.results.report, identifier, value, source)
+        if source == 'agent' and value['verdict'] == 'pass' and result['status'] == 'done':
+            recommendation = await asyncio.to_thread(app.state.release_updates.recommendation)
+            if recommendation:
+                result['updateRecommendation'] = recommendation
+        return result
 
     @app.post('/api/v1/issues/{identifier}/decompose')
     @app.post('/api/v1/agent/issues/{identifier}/decompose')

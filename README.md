@@ -4,6 +4,10 @@
 
 ag-tasks is a local task tracker for people and coding agents. It includes a board, task graph, cross-project dashboard, work sessions and review. Agents use the same MCP tools from Cursor, Codex or any client that supports local stdio MCP. Git merges require a person's approval.
 
+## Install a desktop release
+
+Choose the installer for your OS from [GitHub Releases](https://github.com/PonomarevRA/ag-tasks/releases). See [what changed](CHANGELOG.md) and the [desktop release guide](packaging/RELEASE.md).
+
 ## Install from source
 
 Use Git and Python 3.11 or newer. Run these commands in a terminal on macOS or Linux:

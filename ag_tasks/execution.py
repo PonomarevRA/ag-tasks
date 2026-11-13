@@ -67,8 +67,10 @@ class Execution:
         active = connection.execute("SELECT * FROM work_sessions WHERE issue_id=? AND state='running'", (issue_id,)).fetchone()
         if active:
             self._close(connection, active)
+        issue = self.store._row(issue_id, connection)
         connection.execute("UPDATE issues SET status='rework',updated_at=? WHERE id=?", (self._stamp(), issue_id))
-        self.store._audit(connection, issue_id, action, actor, {'criterionFailures': problems})
+        self.store._audit(connection, issue_id, action, actor, {'criterionFailures': problems, 'fromStatus': issue['status'],
+            'toStatus': 'rework', 'reason': 'definition_failed'})
         return DomainError('definition_failed', 'The issue needs rework before this operation.', 409,
                            details={'issueId': issue_id, 'status': 'rework', 'criterionFailures': problems})
 
@@ -82,9 +84,12 @@ class Execution:
             active = connection.execute("SELECT * FROM work_sessions WHERE issue_id=? AND state='running'", (issue_id,)).fetchone()
             if active is None or not self._expired(active):
                 return
+            prior = connection.execute('SELECT status FROM issues WHERE id=?', (issue_id,)).fetchone()['status']
             self._close(connection, active, 'expired')
             connection.execute("UPDATE issues SET status=CASE WHEN status='in_progress' THEN 'ready' ELSE status END,updated_at=? WHERE id=? AND status NOT IN ('done','cancelled')", (self._stamp(), issue_id))
-            self.store._audit(connection, issue_id, 'work_expired', 'system', {'sessionId': active['id'], 'leaseSeconds': LEASE_SECONDS})
+            self.store._audit(connection, issue_id, 'work_expired', 'system', {'sessionId': active['id'],
+                'agentId': active['agent_id'], 'leaseSeconds': LEASE_SECONDS, 'fromStatus': prior,
+                'toStatus': 'ready' if prior == 'in_progress' else prior, 'reason': 'lease_expired'})
 
     def expire_all(self):
         """Check only active session identifiers; one active row per issue keeps polling independent of history size."""
@@ -158,7 +163,8 @@ class Execution:
                         # from the committed elapsed_ms, so SQLite rollback cannot reset time.
                         self.ticks[identifier] = self.monotonic()
                         connection.execute("UPDATE issues SET status='in_progress',updated_at=? WHERE id=?", (now, issue_id))
-                        self.store._audit(connection, issue_id, 'work_started', actor, {'agentId': supplied['agentId'], 'sessionId': identifier, 'intendedRole': issue['intended_role']})
+                        self.store._audit(connection, issue_id, 'work_started', actor, {'agentId': supplied['agentId'], 'sessionId': identifier, 'intendedRole': issue['intended_role'],
+                            'fromStatus': issue['status'], 'toStatus': 'in_progress'})
         except BaseException:
             if identifier:
                 self.ticks.pop(identifier, None)
@@ -166,12 +172,21 @@ class Execution:
         if error:
             raise error
         self.prune()
-        return self.store.get(issue_id)
+        result = self.store.get(issue_id)
+        active = result['work']['activeSession']
+        if active and active['sessionId'] == identifier:
+            from service_telemetry.integration import request_diagnostics
+            request_diagnostics(sessionId=identifier, agentId=supplied['agentId'])
+        return result
 
     def session(self, connection, issue_id, supplied, *, running=True):
         """Match all session fields; caller-provided labels alone never select a different task's running session."""
         session = connection.execute('SELECT * FROM work_sessions WHERE id=? AND issue_id=? AND agent_id=? AND session_key=?',
                                      (supplied['sessionId'], issue_id, supplied['agentId'], supplied['sessionKey'])).fetchone()
+        if session is not None:
+            from service_telemetry.integration import request_diagnostics, resolved_task
+            resolved_task(issue_id, session['issue_id'])
+            request_diagnostics(sessionId=session['id'], agentId=session['agent_id'])
         if session is None or running and session['state'] != 'running':
             raise DomainError('work_session_unavailable', 'Explicit work session is unavailable or expired.', 409)
         return session
@@ -208,10 +223,13 @@ class Execution:
         with self.store.db.transaction() as connection:
             session = self.session(connection, issue_id, supplied, running=False)
             if session['state'] == 'running':
+                prior = self.store._row(issue_id, connection)['status']
+                new_status = 'blocked' if reason == 'blocked' else 'ready'
                 self._close(connection, session)
                 connection.execute('UPDATE work_sessions SET pause_reason=?,next_action=? WHERE id=?', (reason, next_action, session['id']))
-                connection.execute("UPDATE issues SET status=CASE WHEN status='in_progress' THEN ? ELSE status END,updated_at=? WHERE id=?", ('blocked' if reason == 'blocked' else 'ready', self._stamp(), issue_id))
-                self.store._audit(connection, issue_id, 'work_stopped', actor, {'sessionId': session['id'], 'reason': reason, 'nextAction': next_action})
+                connection.execute("UPDATE issues SET status=CASE WHEN status='in_progress' THEN ? ELSE status END,updated_at=? WHERE id=?", (new_status, self._stamp(), issue_id))
+                self.store._audit(connection, issue_id, 'work_stopped', actor, {'sessionId': session['id'], 'reason': reason, 'nextAction': next_action,
+                    'agentId': session['agent_id'], 'fromStatus': prior, 'toStatus': new_status if prior == 'in_progress' else prior})
         return self.store.get(issue_id)
 
     def project(self, issue_id):

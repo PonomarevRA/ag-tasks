@@ -34,6 +34,18 @@ class SessionPresence:
             self.entries[session_id] = entry
             return self._snapshot(entry, now)
 
+    def expire(self, only_session=None):
+        """Mark elapsed connected leases once, retaining their last observed time for readers."""
+        with self.lock:
+            now = self.clock()
+            expired = []
+            entries = self.entries.items() if only_session is None else ((only_session, self.entries.get(only_session)),)
+            for session_id, entry in entries:
+                if entry and entry['state'] == 'connected' and entry['expires'] <= now:
+                    entry['state'] = 'stale'
+                    expired.append(session_id)
+            return expired
+
     def connected_ids(self):
         """Filter the durable session page to connections whose current lease is still confirmed."""
         with self.lock:

@@ -366,7 +366,8 @@ dialog .dialog-actions {
 .criterion-editor .criterion-remove {
   margin: 0;
 }
-.task-detail-layout {
+.task-detail-layout,
+.task-detail-skeleton {
   min-width: 0;
 }
 .task-detail-summary {
@@ -388,6 +389,20 @@ dialog .dialog-actions {
 .task-detail-summary p {
   margin: 6px 0;
   font-size: 14px;
+}
+.task-detail-next {
+  margin-block-start: 12px;
+  max-inline-size: 100%;
+}
+:is(.task-detail-layout, .review-inbox-row) .ag-button,
+:is(.task-detail-layout, .review-inbox-row) .ag-button .ag-nav__label {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.review-progress {
+  overflow-wrap: anywhere;
 }
 .task-detail-columns {
   display: grid;
@@ -511,10 +526,40 @@ dialog .dialog-actions {
 .task-detail-slot :is(.description, .history p) {
   overflow-wrap: anywhere;
 }
-.detail-loading {
-  margin: 0;
-  padding-block: 24px;
-  color: var(--muted);
+.task-detail-skeleton :is(.task-detail-summary, .task-detail-main, .task-detail-actions) {
+  display: grid;
+  gap: 12px;
+}
+.task-detail-skeleton-line {
+  display: block;
+  width: 100%;
+  height: 0.9rem;
+  max-inline-size: 100%;
+  border-radius: 5px;
+  background: var(--ag-surface-alt, var(--subtle));
+}
+.task-detail-skeleton .skeleton-status {
+  width: 7rem;
+  height: 1.4rem;
+  border-radius: 100vw;
+}
+.task-detail-skeleton .skeleton-heading {
+  width: 66%;
+  height: 1.25rem;
+}
+.task-detail-skeleton .skeleton-caption {
+  width: 48%;
+}
+.task-detail-skeleton .skeleton-action {
+  width: 14rem;
+  height: 2.6rem;
+  margin-block-start: 4px;
+  background: var(--ag-border, var(--line));
+}
+.task-detail-skeleton .skeleton-section {
+  height: 2.4rem;
+  border: 1px solid var(--line);
+  background: transparent;
 }
 .task-detail-slot details > .task-field {
   margin-block: 12px;
@@ -670,11 +715,11 @@ body[data-task-view="reviews"] #content > .ag-empty {
   }
   .task-detail-actions {
     grid-column: 1;
-    grid-row: 1;
+    grid-row: 2;
   }
   .task-detail-main {
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 1;
   }
   .task-detail-actions .status-bar {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -750,14 +795,16 @@ body[data-task-view="reviews"] #content > .ag-empty {
   }
 }
 
+/* Keep the live region available to assistive technology without repeating the heading on screen. */
 .detail-feedback {
-  flex: none;
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
   margin: 0;
-  padding: 12px 24px 0;
-  color: var(--muted);
-}
-.detail-feedback:empty {
-  display: none;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .dialog-actions .ag-button,
 .task-detail-actions .ag-button {

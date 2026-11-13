@@ -1,5 +1,6 @@
 import {element, button, emptyState} from './dom.js';
 import {renderCardSummary} from './task-card.js';
+import {renderReviewProgress} from './review-progress.js';
 
 /** Render actionable reviews with owned async effects; the host supplies a complete bounded page. */
 export function renderReviewInbox(container, issues, {request, onOpen, onRefresh, spaceId}) {
@@ -54,18 +55,19 @@ export function renderReviewInbox(container, issues, {request, onOpen, onRefresh
   const list = element('div', null, 'issue-list review-issue-list');
   for (const issue of issues) {
     const row = element('section', null, 'section review-inbox-row');
-    const open = button(`${issue.key}: ${issue.title}`, () => onOpen(issue.id), 'issue-row');
+    const open = button(`${issue.key}: ${issue.title}`, () => { void onOpen(issue.id, open); }, 'issue-row');
     open.dataset.issueId = issue.id;
     renderCardSummary(open, issue);
     row.append(open);
     const target = issue.reviewTarget;
-    if (target) row.append(button(`Результат ${target.key} · поколение ${target.generation}`, () => onOpen(target.id)));
-    const hours = Math.max(0, Math.floor((Date.now() - Date.parse(issue.createdAt)) / 3600000));
-    row.append(element('p', `Ожидание: ${Number.isFinite(hours) ? hours + ' ч' : 'неизвестно'} · Рецензент: ${issue.handoff?.reviewerId || issue.assignee || 'не назначен'}`, 'muted'));
+    if (target) {
+      const producer = button(`Результат ${target.key} · поколение ${target.generation}`, () => { void onOpen(target.id, producer); });
+      producer.dataset.issueId = target.id;
+      row.append(producer);
+    }
+    renderReviewProgress(row, issue.reviewProgress);
     const handoff = issue.handoff;
-    const labels = {reviewer_required:'Назначьте рецензента',assigned:'Назначена · ожидает начала проверки',queued:'Передана в очередь · ожидает исполнителя',inspect_worker:'Проверьте состояние исполнителя'};
-    row.append(element('p', issue.work?.activeSession ? 'Рецензент работает' : labels[handoff?.state] || 'Проверьте передачу рецензенту', 'coverage-notice'));
-    if (handoff?.assignedAt) {
+    if (handoff?.assignedAt && issue.reviewProgress?.reason !== 'active') {
       row.append(button('Снять назначение', async () => {
         try {
           await request(`/api/v1/issues/${encodeURIComponent(issue.id)}/review-assignment/release`, 'POST', {expectedAssignedAt:handoff.assignedAt});
@@ -73,7 +75,7 @@ export function renderReviewInbox(container, issues, {request, onOpen, onRefresh
         } catch (error) { if (!disposed) notice.textContent = error.message; }
       }));
     }
-    if (handoff?.state === 'reviewer_required') {
+    if (issue.reviewProgress?.reason === 'reviewer_required') {
       const assignControl = button('Передать выбранному рецензенту', () => assign(issue, assignControl));
       row.append(assignControl);
     }

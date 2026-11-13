@@ -264,7 +264,12 @@ def build_mcp(origin=None, directory=None, client=None, *, desktop_automation=Fa
     def tasks_review_report(critic_id: str, agent_id: str, session_id: str, session_key: str,
                             generation: int, definition_revision: int, verdict: Literal["pass", "rework"],
                             summary: str, findings: list[str], evidence: str, reviewed_head: str | None = None) -> dict:
-        """Report declared critic evidence for the exact parent generation/definition/head; no report grants human merge authority."""
+        """Report exact-generation critic evidence; only the human can approve a merge.
+
+        If this completes the task and returns updateRecommendation, mention the available version,
+        short localized changelog and official URL only in the final user reply. Never delay work
+        or install an update on the user's behalf.
+        """
         return request("POST", "/api/v1/agent/issues/" + issue_path(critic_id) + "/review-report",
                        {"agentId": agent_id, "sessionId": session_id, "sessionKey": session_key,
                         "generation": generation, "definitionRevision": definition_revision, "reviewedHead": reviewed_head,

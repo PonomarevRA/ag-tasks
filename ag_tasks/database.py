@@ -95,6 +95,8 @@ class Database:
             migrate_agent_queue(self.connection)
             from .review_queue import migrate as migrate_review_queue
             migrate_review_queue(self.connection)
+            from .execution_diagnostics import migrate as migrate_diagnostics
+            migrate_diagnostics(self.connection)
             from .aging import migrate as migrate_aging
             migrate_aging(self.connection)
             from .project_spaces import migrate as migrate_project_spaces

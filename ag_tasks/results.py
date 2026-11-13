@@ -89,7 +89,8 @@ class Results:
                 self.store.execution._close(connection, session)
             connection.execute("UPDATE issues SET status='cancelled',updated_at=? WHERE id=?", (timestamp(), old['id']))
             self.store.reviews.cancel_waiting(connection, old['id'])
-            self.store._audit(connection, old['id'], 'critic_superseded', 'system', {'newGeneration': generation, 'reason': reason})
+            self.store._audit(connection, old['id'], 'critic_superseded', 'system', {'newGeneration': generation, 'reason': reason, 'parentId': parent_id,
+                'criticReviewId': old['id'], 'fromStatus': old['status'], 'toStatus': 'cancelled'})
 
     def guard(self, issue_id, connection, *, complete=False, proposed=None):
         """Apply identical completion rules to generic status edits and final Git merge admission."""
@@ -166,8 +167,10 @@ class Results:
                 connection.execute('UPDATE issues SET space_number=? WHERE id=?', (allocate(connection, issue['space_id']), critic))
                 remember_key(connection, critic, issue_key(connection, self.store._row(critic, connection)))
                 connection.execute("UPDATE issues SET result_generation=?,critic_review_id=?,status='in_review',updated_at=? WHERE id=?", (generation, critic, now, issue_id))
-                self.store._audit(connection, issue_id, 'result_submitted', actor, {'generation': generation, 'criticReviewId': critic, 'definitionRevision': issue['definition_revision']})
-                self.store._audit(connection, critic, 'critic_review_created', 'system', {'generation': generation, 'parentId': issue_id})
+                self.store._audit(connection, issue_id, 'result_submitted', actor, {'generation': generation, 'criticReviewId': critic, 'definitionRevision': issue['definition_revision'],
+                    'agentId': session['agent_id'], 'sessionId': session['id'], 'fromStatus': issue['status'], 'toStatus': 'in_review'})
+                self.store._audit(connection, critic, 'critic_review_created', 'system', {'generation': generation, 'parentId': issue_id,
+                    'definitionRevision': issue['definition_revision'], 'criticReviewId': critic, 'toStatus': 'ready'})
                 self.store.reviews.route_new(critic, issue)
         if error:
             raise error
@@ -225,7 +228,10 @@ class Results:
             connection.execute("UPDATE issues SET status='done',dod=?,updated_at=? WHERE id=?", (json.dumps(completion), timestamp(), critic_id))
             if value['verdict'] == 'rework':
                 connection.execute("UPDATE issues SET status='rework',updated_at=? WHERE id=?", (timestamp(), parent['id']))
-            self.store._audit(connection, parent['id'], 'critic_reported', actor, {'verdict': value['verdict'], 'generation': current['generation'], 'agentId': supplied['agentId'], 'summary': summary, 'findings': findings})
+            self.store._audit(connection, parent['id'], 'critic_reported', actor, {'verdict': value['verdict'], 'generation': current['generation'], 'agentId': supplied['agentId'], 'summary': summary, 'findings': findings,
+                'sessionId': session['id'], 'criticReviewId': critic_id, 'definitionRevision': parent['definition_revision'],
+                'reason': 'critic_pass' if value['verdict'] == 'pass' else 'critic_rework',
+                'fromStatus': parent['status'], 'toStatus': 'rework' if value['verdict'] == 'rework' else parent['status']})
             if value['verdict'] == 'pass':
                 from .completion import complete_ready
                 complete_ready(self.store, connection, parent['id'])

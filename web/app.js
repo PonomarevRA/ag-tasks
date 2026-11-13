@@ -1,4 +1,4 @@
-import {createTaskDetailLayout} from './task-detail-layout.js';
+import {createTaskDetailLayout, createTaskDetailSkeleton} from './task-detail-layout.js';
 import {renderTaskConversations} from './task-conversations.js';
 import {bindWorkAreaFit} from './work-area-fit.js';
 import {renderManagerWorkspace} from './manager-workspace.js';
@@ -32,27 +32,47 @@ const content = document.querySelector("#content");
 const editor = document.querySelector("#editor");
 const detail = document.querySelector("#detail");
 const approval = document.querySelector("#approval");
-let detailDraft = null;
-let detailGeneration = 0, reviewGeneration = 0, editorGeneration = 0, editingIssue = null, detailOpener = null, editorBaseline = null;
+let detailDraft = null, detailOrigin = null, pendingDetailReturn = null;
+let detailGeneration = 0, reviewGeneration = 0, editorGeneration = 0, editingIssue = null, editorBaseline = null;
 // Editor identity advances on open; dialog.open fences closed drafts without a queued-close race.
 bindIssueEditorValidation(document.querySelector("#issue-form"));
-// Closing a dialog invalidates requests already in flight, including after a slow Git review.
+/** Restore the source row by identity, or the view heading if it has left the current result set. */
+function restoreDetailFocus(origin) {
+  if (!origin || document.querySelector("dialog[open]")) return;
+  const visible = node => node?.isConnected && !node.disabled && !node.closest("[hidden],[inert],dialog:not([open])");
+  const original = visible(origin.opener) ? origin.opener : null;
+  const replacement = [...content.querySelectorAll("[data-issue-id]")].find(node => node.dataset.issueId === origin.id && visible(node));
+  (original || replacement || document.querySelector("#heading")).focus();
+}
+
+/** Let a replaced manager table finish before resolving its source button. */
+function managerLoading() {
+  return Boolean(content.querySelector('.manager-report[aria-busy="true"]'));
+}
+
+/** Restore late-arriving focus only while the fallback heading still owns it. */
+function finishDetailFocus() {
+  if (state.loading || managerLoading()) return;
+  if (pendingDetailReturn && document.activeElement === document.querySelector("#heading")) {
+    restoreDetailFocus(pendingDetailReturn);
+  }
+  pendingDetailReturn = null;
+}
+
+// Closing invalidates in-flight reads while retaining the source of the original dialog entry.
 detail.addEventListener("close", () => {
-  if (detail.open) return; // A queued close from A does not own an already reopened B.
-  const identifier = state.selected?.id;
+  if (detail.open) return;
   detailGeneration++;
   reviewGeneration++;
   state.selected = null;
   detailDraft = null;
-  // A nested editor or approval dialog retains focus until it closes.
   if (!document.querySelector("dialog[open]")) {
-    const card = [...content.querySelectorAll("[data-issue-id]")].find(node => node.dataset.issueId === identifier);
-    const opener = card || detailOpener;
-    const hiddenDialog = opener?.closest("dialog");
-    if (opener?.isConnected && !opener.disabled && (!hiddenDialog || hiddenDialog.open)) opener.focus();
-    else document.querySelector("#main").focus();
+    if (detailOrigin && (state.loading || managerLoading())) {
+      pendingDetailReturn = detailOrigin;
+      document.querySelector("#heading").focus();
+    } else restoreDetailFocus(detailOrigin);
   }
-  detailOpener = null;
+  detailOrigin = null;
 });
 approval.addEventListener("close", () => { if (!approval.open) { reviewGeneration++; state.review = null; } });
 
@@ -128,6 +148,7 @@ async function refresh(append = false) {
       state.loading = false;
       content.setAttribute("aria-busy", "false");
       content.inert = false;
+      finishDetailFocus();
     }
   }
 }
@@ -198,7 +219,7 @@ function render() {
     return;
   }
   if (state.view === 'analytics') {
-    graphDisposer = renderManagerWorkspace(content, {request, openIssue, filters:analyticsFilters});
+    graphDisposer = renderManagerWorkspace(content, {request, openIssue, filters:analyticsFilters, onSettled:finishDetailFocus});
     return;
   }
   if (state.view === "repositories") { renderRepositories(); return; }
@@ -300,7 +321,7 @@ function renderSpaces() {
 
 /** Show hierarchy, status and assignee on a compact clickable issue card. */
 function issueCard(issue, row = false) {
-  const card = button(issue.title, () => openIssue(issue.id), row ? "issue-row" : "card");
+  const card = button(issue.title, () => { void openIssue(issue.id, card); }, row ? "issue-row" : "card");
   applyIdentity(card, issue.title, issue.spaceName || issue.spaceId);
   card.replaceChildren(); card.dataset.issueId = issue.id; card.setAttribute("aria-label", `${issue.key}: ${issue.title}`);
   renderCardSummary(card, issue);
@@ -369,19 +390,25 @@ function openEditor(parent = null, existing = null) {
 /**
  * Load an exact task session while retaining the surrounding board and same-task comment draft.
  * @param {string} identifier - Server ID or public task key; used only in fixed bounded read routes.
+ * @param {Element} opener - Explicit button for pointer activation in native WebKit.
  * Closed or superseded sessions ignore late responses; current failures retain an explicit safe retry.
  */
-async function openIssue(identifier) {
-  if (!detail.open) detailOpener = document.activeElement;
+async function openIssue(identifier, opener = document.activeElement) {
+  if (!detail.open) {
+    detailOrigin = {id:identifier, opener:opener !== document.body ? opener : null};
+    pendingDetailReturn = null;
+  }
   const generation = ++detailGeneration;
   const body = document.querySelector("#detail-body");
   const comment = body.querySelector('[data-detail-draft="comment"]');
   if (state.selected?.id === identifier && comment)
-    detailDraft = {id:identifier, comment:comment.value.slice(0, 8192), open:comment.closest('.task-detail-disclosure').open};
+    detailDraft = {id:identifier, comment:comment.value.slice(0, 8192), expanded:new Map(
+      [...body.querySelectorAll("[data-detail-section]")].map(section => [section.dataset.detailSection, section.open])
+    )};
   else if (detailDraft?.id !== identifier) detailDraft = null;
   state.selected = null;
   document.querySelector("#detail-title").textContent = "Загрузка задачи…";
-  body.replaceChildren(element("p", "Загружаем задачу и её связи…", "detail-loading"));
+  body.replaceChildren(createTaskDetailSkeleton());
   body.setAttribute("aria-busy", "true");
   document.querySelector("#detail-feedback").textContent = "Загружаем задачу…";
   // Show immediately: a pending B already owns its dialog when close(A) is delivered.
@@ -394,11 +421,12 @@ async function openIssue(identifier) {
     if (!ownsDetail()) return;
     state.selected = issue;
     document.querySelector("#detail-title").textContent = `${issue.key} · ${issue.title}`;
-    const layout = createTaskDetailLayout(issue);
+    const nextAction = taskDetailAction(issue);
+    const layout = createTaskDetailLayout(issue, {nextAction, expanded:detailDraft?.expanded});
     layout.description.append(issue.descriptionHtml ? markdownBody(issue.descriptionHtml) : element("p", issue.description || "Описание пока не добавлено", "description"));
-    layout.description.append(element('p',`Ответственный: ${issue.assignee || 'Не назначен'} · Приоритет: ${priorities[issue.priority] || issue.priority} · Срок (UTC): ${issue.dueDate || 'Не задан'}`,'muted'));
+    layout.description.append(element('p',`Приоритет: ${priorities[issue.priority] || issue.priority} · Срок (UTC): ${issue.dueDate || 'Не задан'}`,'muted'));
     const reload = async () => { await refresh(); if (detail.open && state.selected?.id === issue.id) await openIssue(issue.id); };
-    renderIssueControls(layout.actions, issue);
+    renderIssueControls(layout.actions, issue, nextAction?.kind);
     layout.actions.append(layout.overview.parentElement);
     renderDocuments(layout.documents, issue, reload);
     renderPlanning(layout.planning, issue, reload, openIssue);
@@ -411,10 +439,9 @@ async function openIssue(identifier) {
     if (detailDraft?.id === issue.id) {
       const retained = body.querySelector('[data-detail-draft="comment"]');
       retained.value = detailDraft.comment;
-      retained.closest('.task-detail-disclosure').open = detailDraft.open;
     }
     const activeDialog = document.activeElement?.closest("dialog[open]");
-    if (!activeDialog && detail.open) detail.querySelector("[data-close=detail]").focus();
+    if ((!activeDialog || document.activeElement === detail) && detail.open) detail.querySelector("[data-close=detail]").focus();
   } catch (error) {
     if (!ownsDetail()) return;
     document.querySelector("#detail-title").textContent = "Задача не загружена";
@@ -429,8 +456,37 @@ async function openIssue(identifier) {
   }
 }
 
+/** Resolve one available phase action using the detail's authoritative relationship targets. */
+function taskDetailAction(issue) {
+  const target = issue.reviewProgress?.nextAction;
+  if (target?.kind === "open_critic" && target.issueId !== issue.id) {
+    return {kind:target.kind, label:`Открыть проверку ${target.key}`, run:() => openIssue(target.issueId)};
+  }
+  if (target?.kind === "open_critic" && issue.reviewProgress.reason !== "active") {
+    return {kind:"review_inbox", label:"Открыть очередь ревью", run:async () => {
+      detailOrigin = null;
+      detail.close();
+      state.spaceId = issue.spaceId;
+      if (await navigate("reviews")) document.querySelector("#heading").focus();
+    }};
+  }
+  if (issue.lifecycle?.phase === "awaiting_merge" && issue.branch) {
+    return {kind:"diff", label:"Просмотреть изменения", run:() => openReview(issue.id)};
+  }
+  const child = issue.attentionChild;
+  if (child) return {kind:"child", label:`Открыть подзадачу ${child.key}`, run:() => openIssue(child.id)};
+  if (issue.status === "stale" && !issue.archivedAt) {
+    return {kind:"revalidate", label:"Перейти к переактуализации", run:() => {
+      const planning = detail.querySelector('[data-detail-section="planning"]');
+      planning.open = true;
+      (planning.querySelector("textarea,input") || planning.querySelector("summary")).focus();
+    }};
+  }
+  return null;
+}
+
 /** Provide explicit status changes and isolated branch/review commands. */
-function renderIssueControls(body, issue) {
+function renderIssueControls(body, issue, primaryKind) {
   const bar = element("div", null, "status-bar");
   const select = element("select");
   select.setAttribute("aria-label", "Статус задачи");
@@ -445,13 +501,13 @@ function renderIssueControls(body, issue) {
     try { await request(`/api/v1/issues/${issue.id}`, "PATCH", {status:select.value}); }
     catch (error) { await openIssue(issue.id); throw error; }
     await refresh(); if (detail.open && state.selected?.id === issue.id) await openIssue(issue.id);
-  }), button("Редактировать", () => openEditor(null, issue), "primary"), button("＋ Подзадача", () => openEditor(issue)));
+  }), button("Редактировать", () => openEditor(null, issue)), button("＋ Подзадача", () => openEditor(issue)));
   if (issue.repoId && !issue.branch && !issue.archivedAt && !["done", "cancelled", "stale"].includes(issue.status)) bar.append(button("Создать рабочую ветку", async () => {
     await request(`/api/v1/issues/${issue.id}/prepare`, "POST", {});
     await refresh(); if (detail.open && state.selected?.id === issue.id) await openIssue(issue.id);
   }));
-  if (issue.branch) {
-    bar.append(button("Просмотреть изменения", () => openReview(issue.id), "primary"));
+  if (issue.branch && primaryKind !== "diff") {
+    bar.append(button("Просмотреть изменения", () => openReview(issue.id)));
   }
   bar.append(button("Обновить карточку", () => openIssue(issue.id)));
   if (issue.archivedAt) {
@@ -735,8 +791,7 @@ document.querySelector("#delete-form").addEventListener("submit", async event =>
     deletingIssue = null;
     document.querySelector("#delete-dialog").close(); detail.close();
     await refresh();
-    // The deleted card cannot receive focus after the list is replaced.
-    document.querySelector("#main").focus();
+    document.querySelector("#heading").focus();
   } catch (error) { report(error); } finally { submit.disabled = false; }
 });
 document.querySelector("#delete-dialog").addEventListener("close", () => { deletingIssue = null; });

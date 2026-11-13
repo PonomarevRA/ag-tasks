@@ -20,7 +20,7 @@ function scrollState(node) {
 }
 
 /** Mount operational filters and read-only polling; server owns queue/count/deadline semantics. */
-export function renderManagerControl(target,{request,openIssue,filters}) {
+export function renderManagerControl(target,{request,openIssue,filters,onSettled}) {
   const root = element('section',null,'manager-control');
   const form = element('form',null,'manager-filters ag-form-tracks');
   form.dataset.agSelectIndicators = '';
@@ -161,7 +161,7 @@ export function renderManagerControl(target,{request,openIssue,filters}) {
     } catch (error) {
       if (!disposed && version===generation) status.textContent=`${result.childNodes.length?'Показан предыдущий снимок. ':''}Обновление не удалось: ${error.message}. Нажмите «Обновить контроль».`;
     } finally {
-      if (!disposed && version===generation) {pending=false;result.removeAttribute('aria-busy');schedule();}
+      if (!disposed && version===generation) {pending=false;result.removeAttribute('aria-busy');onSettled?.();schedule();}
     }
   }
   load(0);

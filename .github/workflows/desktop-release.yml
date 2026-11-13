@@ -5,8 +5,31 @@ on:
     tags: ['v*']
 permissions:
   contents: read
+concurrency:
+  group: desktop-release-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate version and changelog
+        env:
+          RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+        shell: bash
+        run: |
+          if [ -n "$RELEASE_TAG" ]; then
+            python packaging/release.py --tag "$RELEASE_TAG"
+          else
+            python packaging/release.py
+          fi
   native:
+    needs: validate
     strategy:
       fail-fast: false
       matrix:
@@ -20,6 +43,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -34,10 +59,17 @@ jobs:
       - run: python -m pytest -q
       - run: npm test
       - run: python packaging/build.py
+      - name: Build native macOS request widget provider
+        if: runner.os == 'macOS' && hashFiles('packaging/widgets/macos/build.py') != ''
+        run: python packaging/widgets/macos/build.py
       - name: Windows installer compiler
         if: runner.os == 'Windows'
         run: choco install innosetup --no-progress --yes
-      - name: Build platform installer
+      - name: Build macOS installer with widgets
+        if: runner.os == 'macOS' && hashFiles('packaging/widgets/macos/build.py') != ''
+        run: python packaging/build_installer.py --manifest packaging/desktop-product.json --source "${{ matrix.payload }}" --output artifacts/installers --widgets-source "packaging/widgets/macos/build/AG Requests Widgets.app"
+      - name: Build standalone installer
+        if: runner.os != 'macOS' || hashFiles('packaging/widgets/macos/build.py') == ''
         run: python packaging/build_installer.py --manifest packaging/desktop-product.json --source "${{ matrix.payload }}" --output artifacts/installers
       - uses: actions/upload-artifact@v4
         with:
@@ -45,28 +77,35 @@ jobs:
           path: artifacts/installers
           if-no-files-found: error
   release:
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.repository == 'PonomarevRA/ag-tasks' && github.ref_type == 'tag'
     needs: native
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Match tag to product version
-        env:
-          RELEASE_TAG: ${{ github.ref_name }}
-        run: python -c "import json,os; assert os.environ['RELEASE_TAG']=='v'+json.load(open('packaging/desktop-product.json'))['version']"
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify release commit is in public main
+        run: git merge-base --is-ancestor HEAD origin/main
       - uses: actions/download-artifact@v4
         with:
           pattern: ag-tasks-*
           merge-multiple: true
           path: release-assets
+      - name: Verify installer checksums and stage release
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python packaging/release.py --tag "$RELEASE_TAG" --artifacts release-assets --output staged-release
       - name: Publish platform installers
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.ref_name }}
         shell: bash
         run: |
-          cd release-assets
-          cat *.sha256 > SHA256SUMS
-          gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --title "$RELEASE_TAG" --notes "Standalone installers. macOS builds are ad-hoc signed and not notarized. Setup selects external artifact and backup folders." -- *.dmg *.exe *.tar.gz *.json SHA256SUMS
+          gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --latest \
+            --title "ag-tasks $RELEASE_TAG" --notes-file staged-release/notes.md -- staged-release/upload/*

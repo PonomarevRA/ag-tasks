@@ -229,7 +229,7 @@ test('terminal archive, restore and tombstone require explicit UI actions and de
   await until(() => !app.document.querySelector('#detail').open && app.document.querySelector('#detail-body').getAttribute('aria-busy') === 'false');
   assert.equal(app.calls.find(call=>call.method==='DELETE').headers['X-Ag-Tasks-UI'],'fixture-token');
   assert.ok(app.records[0].deletedAt);
-  await until(() => app.document.activeElement === app.document.querySelector('#main'));
+  await until(() => app.document.activeElement === app.document.querySelector('#heading'));
 });
 
 test('a delayed previous-space refresh cannot replace a newer selected space', async t => {
@@ -309,7 +309,7 @@ test('replacing archive actions keeps focus inside the task dialog and closing r
   await until(() => [...app.document.querySelectorAll('#detail-body button')].some(node=>node.textContent==='Восстановить из архива'));
   assert.ok(app.document.querySelector('#detail').contains(app.document.activeElement));
   app.document.querySelector('#detail [data-close]').click();
-  assert.equal(app.document.activeElement, app.document.querySelector('#main'));
+  assert.equal(app.document.activeElement, app.document.querySelector('#heading'));
 });
 
 test('closing an unchanged task dialog restores its initiating card', async t => {
@@ -540,9 +540,15 @@ test('queued close(A) cannot cancel pending detail B and normal close restores B
   await new Promise(resolve => setTimeout(resolve, 5));
   assert.equal(detail.open, true);
   assert.match(app.document.querySelector('#detail-title').textContent, /Загрузка/);
+  const skeleton = app.document.querySelector('.task-detail-skeleton');
+  assert.equal(skeleton.getAttribute('aria-hidden'), 'true');
+  assert.equal(skeleton.querySelectorAll('button, input, [tabindex]').length, 0);
+  assert.equal(app.document.querySelector('#detail-body').getAttribute('aria-busy'), 'true');
+  assert.match(app.document.querySelector('#detail-feedback').textContent, /Загружаем задачу/);
   assert.ok(app.document.querySelector('#detail-feedback').textContent);
   release(); await until(ready);
   assert.match(app.document.querySelector('#detail-title').textContent, /TASK-other/);
+  assert.equal(app.document.querySelector('.task-detail-skeleton'), null);
   assert.equal(app.document.querySelector('#detail-feedback').textContent, '');
   detail.close();
   await until(() => app.document.activeElement === other);
@@ -573,15 +579,18 @@ test('same-task refresh retains an unsaved comment; a failed read retries withou
   const comment = app.document.querySelector('[data-detail-draft=comment]');
   comment.closest('.task-detail-disclosure').open = true;
   comment.value = 'Unsaved evidence draft';
+  app.document.querySelector('[data-detail-section=criteria]').open = false;
   fail = true;
   [...app.document.querySelectorAll('#detail-body button')].find(b => b.textContent === 'Обновить карточку').click();
   await until(() => app.document.querySelector('#detail-body .error'));
+  assert.equal(app.document.querySelector('.task-detail-skeleton'), null);
   assert.equal(app.document.querySelector('#detail').open, true);
   fail = false;
   [...app.document.querySelectorAll('#detail-body button')].find(b => b.textContent === 'Повторить загрузку задачи').click();
   await until(ready);
   const retained = app.document.querySelector('[data-detail-draft=comment]');
   assert.equal(retained.value, 'Unsaved evidence draft');
+  assert.equal(app.document.querySelector('[data-detail-section=criteria]').open, false);
   assert.equal(retained.closest('.task-detail-disclosure').open, true);
   assert.equal(app.calls.some(call => call.method !== 'GET'), false);
 });
@@ -722,4 +731,23 @@ test('failed navigation cannot expose previous-context data through local filter
   query.value = 'root'; query.dispatchEvent(new app.window.Event('input'));
   assert.equal(app.document.querySelectorAll('[data-issue-id]').length, 0);
   assert.match(app.document.querySelector('#content').textContent, /Данные не загружены/);
+});
+
+test('nested review detail retains the original source after the view replaces its row', async t => {
+  const reviewProgress = {reason:'reviewer_required',waitingSince:'2026-10-22T12:00:00Z',
+    lastAttemptExpired:true,nextAction:{kind:'open_critic',issueId:'critic',key:'AGT-2'}};
+  const app = await application(t, [issue('root', {status:'in_review', reviewProgress}), issue('critic', {kind:'review', reviewProgress})]);
+  const source = app.document.querySelector('[data-issue-id=root]');
+  source.click();
+  await until(() => app.document.querySelector('.task-detail-next'));
+  const action = app.document.querySelector('.task-detail-next');
+  assert.match(action.textContent, /AGT-2/);
+  assert.equal(app.document.querySelector('#detail-body button'), action);
+  assert.equal(app.document.querySelector('[data-detail-section=criteria]').open, false);
+  action.click();
+  await until(() => app.document.querySelector('.task-detail-next')?.textContent === 'Открыть очередь ревью');
+  app.document.querySelector('#refresh').click();
+  await until(() => !source.isConnected && !app.document.querySelector('#content').inert);
+  app.document.querySelector('#detail [data-close]').click();
+  assert.equal(app.document.activeElement, app.document.querySelector('[data-issue-id=root]'));
 });

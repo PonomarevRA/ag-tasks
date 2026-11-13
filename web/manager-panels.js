@@ -82,7 +82,9 @@ export function mountManagerPanels(data, {openIssue, onQueue, onPage, queue, off
     const row = body.insertRow();
     const title = element('th');
     title.scope = 'row';
-    title.append(button(`${card.key} · ${card.title}`,() => openIssue(card.id)));
+    const task = button(`${card.key} · ${card.title}`, () => { void openIssue(card.id, task); });
+    task.dataset.issueId = card.id;
+    title.append(task);
     title.append(element('small',kinds[card.kind] || card.kind));
     if (card.reasons.length) title.append(element('p',card.reasons.map(reason => reasons[reason] || reason).join(' · '),'manager-reasons'));
     if (card.lastActivityAt) title.append(element('small',`Активность: ${observedAt(card.lastActivityAt)}`));

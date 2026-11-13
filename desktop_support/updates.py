@@ -18,10 +18,29 @@ class NoRedirect(HTTPRedirectHandler):
 
 def version_tuple(value):
     """Compare stable numeric releases only; reject draft/prerelease naming ambiguity."""
-    match = re.fullmatch(r'v?(\d+)\.(\d+)\.(\d+)', value)
+    match = re.fullmatch(r'v?(0|[1-9][0-9]{0,5})\.(0|[1-9][0-9]{0,5})\.(0|[1-9][0-9]{0,5})', value)
     if not match:
         raise ValueError('Expected a stable semantic version')
     return tuple(int(part) for part in match.groups())
+
+
+def changelog(body):
+    """Keep at most five short plain-text bullets per exact public locale section."""
+    result = {'ru': [], 'en': []}
+    if not isinstance(body, str):
+        return result
+    language = None
+    headings = {'## Русский': 'ru', '## English': 'en'}
+    for line in body.splitlines():
+        if line.startswith('#'):
+            language = headings.get(line)
+        elif language and line.startswith('- ') and len(result[language]) < 5:
+            bullet = line[2:].strip()
+            if (0 < len(bullet) <= 160 and bullet.isprintable()
+                    and not any(char in bullet for char in '<>[]`*@\\')
+                    and '://' not in bullet):
+                result[language].append(bullet)
+    return result
 
 
 def check_release(app_id, current_version):
@@ -35,8 +54,14 @@ def check_release(app_id, current_version):
     if len(payload) > 262144:
         raise ValueError('Release metadata exceeds limit')
     release = json.loads(payload)
+    if not isinstance(release, dict) or not isinstance(release.get('tag_name'), str):
+        raise ValueError('Unexpected release metadata')
     version = release['tag_name']
+    if not version.startswith('v'):
+        raise ValueError('Expected a version tag')
+    parsed = version_tuple(version)
     expected = f'https://github.com/PonomarevRA/{repository}/releases/tag/{version}'
-    if release.get('html_url') != expected or release.get('draft') or release.get('prerelease'):
+    if release.get('html_url') != expected or release.get('draft') is not False or release.get('prerelease') is not False:
         raise ValueError('Unexpected release identity')
-    return {'version': version, 'available': version_tuple(version) > version_tuple(current_version), 'url': expected}
+    return {'version': version, 'available': parsed > version_tuple(current_version), 'url': expected,
+            'changelog': changelog(release.get('body'))}

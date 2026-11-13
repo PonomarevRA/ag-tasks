@@ -26,7 +26,7 @@ class ColdStorage:
         self.worker = None
         self.last_error = None
 
-    def start(self):
+    def start(self, on_presence_expired=None):
         """Run at most one task per minute, starting after a quiet minute; never wake an agent/model."""
         def run():
             while not self.stop_event.wait(60):
@@ -40,6 +40,9 @@ class ColdStorage:
                     self.store.service.session_retention.last_error = None
                 except Exception as error:
                     self.store.service.session_retention.last_error = type(error).__name__
+                if on_presence_expired:
+                    for session_id in self.store.service.sessions.expire_presence():
+                        on_presence_expired(session_id)
                 try:
                     self.store.execution.expire_all()
                     self.store.aging.sweep()

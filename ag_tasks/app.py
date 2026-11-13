@@ -17,7 +17,7 @@ from fastapi import FastAPI, Query, Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from service_telemetry.integration import Telemetry, TelemetryMiddleware, install_routes as install_telemetry_routes
+from service_telemetry.integration import Telemetry, TelemetryMiddleware, install_routes as install_telemetry_routes, request_diagnostics
 
 from . import __version__
 from .issues import DomainError, IssueStore
@@ -59,13 +59,16 @@ async def object_body(request, allowed, required=()):
     return value
 
 
-def create_app(data_dir=None, *, origin=None, desktop_automation=None):
+def create_app(data_dir=None, *, origin=None, desktop_automation=None, release_updates=None):
     """Compose independent issue storage, read APIs, agent actions and user approval."""
     directory = Path(data_dir) if data_dir is not None else default_directory()
     store = IssueStore(directory)
     workflow = GitWorkflow(store)
     instance_id, ui_token = uuid.uuid4().hex, secrets.token_urlsafe(32)
     recent_operations = RecentOperations()
+    from .release_updates import ReleaseUpdates
+    updates = release_updates if release_updates is not None else ReleaseUpdates(directory, __version__)
+    automatic_updates = release_updates is not None or getattr(sys, 'frozen', False)
 
     @asynccontextmanager
     async def lifespan(_):
@@ -86,12 +89,16 @@ def create_app(data_dir=None, *, origin=None, desktop_automation=None):
             await asyncio.to_thread(store.aging.sweep)
         except Exception as error:
             store.aging.last_error = type(error).__name__
-        store.cold.start()
+        store.cold.start(on_presence_expired=app.state.telemetry.record_presence_expired)
+        if automatic_updates:
+            updates.start()
         try:
             yield
         finally:
+            updates.stop()
             if origin:
                 endpoint.unlink(missing_ok=True)
+            await asyncio.to_thread(store.cold.stop)
             await app.state.telemetry.close()
             store.close()
 
@@ -100,6 +107,7 @@ def create_app(data_dir=None, *, origin=None, desktop_automation=None):
     install_activity(app, 'ag-tasks')
     app.state.store, app.state.workflow = store, workflow
     app.state.telemetry = None
+    app.state.release_updates = updates
     install_telemetry_routes(app, lambda: app.state.telemetry, directory)
     app.add_middleware(TelemetryMiddleware, owner=lambda: app.state.telemetry)
 
@@ -150,6 +158,7 @@ def create_app(data_dir=None, *, origin=None, desktop_automation=None):
     @app.exception_handler(DomainError)
     async def domain_error(_, error):
         """Return bounded domain messages without raw Git process output or shell arguments."""
+        request_diagnostics(errorCode=error.code)
         payload = {"code": error.code, "message": error.message}
         if error.details is not None:
             payload['details'] = error.details
@@ -158,6 +167,7 @@ def create_app(data_dir=None, *, origin=None, desktop_automation=None):
     @app.exception_handler(sqlite3.Error)
     async def storage_error(_, error):
         """Keep storage implementation details out of HTTP failures."""
+        request_diagnostics(errorCode="storage_unavailable")
         return JSONResponse({"error": {"code": "storage_unavailable", "message": "Local issue storage unavailable"}}, status_code=503)
 
     @app.get("/healthz")
@@ -170,6 +180,13 @@ def create_app(data_dir=None, *, origin=None, desktop_automation=None):
         """Identify this instance for the standalone MCP bridge."""
         return {"application": "ag-tasks", "version": __version__, "instanceId": instance_id,
                 "statuses": list(STATUSES), 'agentContract': {'version':'ag-tasks-agent/v3', 'freshMcpConsole':True, 'sessionRoleHistory':True, 'statusAudit':True, 'pendingReviews':True, 'reviewAssignmentLaunchesAgent':False, 'completionPolicy':'after_independent_critic', 'mergeApproval':'human_exact_revision', 'lifecycleContract':'ag-tasks-lifecycle/v1', 'implementationIncludesDecomposition':True}, 'contractVersion': 'ag-tasks-workflow/v2', 'roles': list(ROLES), 'leaseSeconds': 90, 'planningContract': 'ag-tasks-planning/v1', 'codeReviewContract': 'ag-tasks-code-review/v1', 'serviceDataContract': store.service.capabilities(), 'aging': {'staleAfterDays': 3, 'activityField': 'lastActivityAt', 'maintenanceError': store.aging.last_error}, 'storage': {'coldAfterDays': 7, 'maintenanceError': store.cold.last_error}}
+
+    @app.get("/api/diagnostics/v1/execution")
+    def execution_metrics(spaceId: str | None = Query(default=None, max_length=128)):
+        """Report current review pressure and the process-local count of coalesced presence pulses."""
+        return {"reviewQueue": store.reviews.metrics(space_id=spaceId),
+                "presencePulsesCoalesced": app.state.telemetry.presence_pulses,
+                "journalCoverage": app.state.telemetry.coverage()}
 
     @app.get("/api/desktop/v1/widget")
     def desktop_widget(request: Request):

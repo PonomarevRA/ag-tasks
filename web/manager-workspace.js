@@ -3,7 +3,7 @@ import {renderWorkAnalytics} from './work-analytics.js';
 import {renderManagerControl} from './manager-control.js';
 
 /** Compose independent operational/historical scopes, preserving applied filters and the manager draft. */
-export function renderManagerWorkspace(target,{request,openIssue,filters}) {
+export function renderManagerWorkspace(target,{request,openIssue,filters,onSettled}) {
   const root=element('section',null,'manager-workspace');
   const modes=element('div',null,'manager-modes');
   modes.setAttribute('role','group');modes.setAttribute('aria-label','Раздел контроля задач');
@@ -17,8 +17,8 @@ export function renderManagerWorkspace(target,{request,openIssue,filters}) {
     for (const [name,control] of Object.entries(controls)) control.setAttribute('aria-pressed',String(name===mode));
     if (mode==='management') {
       filters.manager ||= {};
-      disposeMode=renderManagerControl(host,{request,openIssue,filters:filters.manager});
-    } else disposeMode=renderWorkAnalytics(host,{request,openIssue,filters});
+      disposeMode=renderManagerControl(host,{request,openIssue,filters:filters.manager,onSettled});
+    } else disposeMode=renderWorkAnalytics(host,{request,openIssue,filters,onSettled});
   }
   for (const [name,title] of [['management','Контроль выполнения'],['analytics','Аналитика времени']]) {
     controls[name]=button(title,()=>{if(mode!==name)show(name);});modes.append(controls[name]);

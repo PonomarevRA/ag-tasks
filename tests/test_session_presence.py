@@ -25,6 +25,8 @@ def test_presence_expiry_and_disconnection_are_not_running_model_claims():
     assert registry.touch('one', 'connected')['state'] == 'connected'
     clock[0] += 90
     assert registry.snapshot('one')['state'] == 'stale'
+    assert registry.expire() == ['one']
+    assert registry.expire() == []
     registry.touch('one', 'disconnected')
     assert registry.touch('one', 'connected')['state'] == 'disconnected'
     assert SessionPresence().snapshot('one')['state'] == 'unknown'
@@ -32,7 +34,7 @@ def test_presence_expiry_and_disconnection_are_not_running_model_claims():
 
 def test_http_presence_binding_guard_and_no_durable_heartbeat_growth(tmp_path):
     """Only the matching MCP binding can pulse, and frequent pulses do not append archive entries."""
-    with TestClient(create_app(tmp_path), base_url='http://127.0.0.1:8895') as client:
+    with TestClient(create_app(tmp_path), base_url='http://127.0.0.1:8895', client=('127.0.0.1', 41000)) as client:
         sid = register(client)
         route = '/api/v1/agent/sessions/' + sid + '/presence'
         baseline = client.get('/api/v1/events').json()
@@ -52,5 +54,33 @@ def test_http_presence_binding_guard_and_no_durable_heartbeat_growth(tmp_path):
         assert client.post(route, json={'connectionId':'connection','state':'disconnected'}, headers={'Origin':'https://elsewhere.invalid'}).status_code == 403
         assert client.post(route, json={'connectionId':'connection','state':'disconnected'}).json()['state'] == 'disconnected'
         assert client.get('/api/v1/sessions?activeOnly=true').json()['items'] == []
-    with TestClient(create_app(tmp_path), base_url='http://127.0.0.1:8895') as client:
+        owner = client.app.state.telemetry
+        assert owner.technical.flush() and owner.activity.flush()
+        metrics = client.get('/api/diagnostics/v1/execution').json()
+        assert metrics['presencePulsesCoalesced'] == 4
+        assert all(entry['coverageSeconds'] >= 0 for entry in metrics['journalCoverage'].values())
+        technical = client.get('/api/technical-logs/v1/events').json()['events']
+        presence = [event for event in technical if '/presence' in event['message']]
+        assert sorted(event['properties']['statusCode'] for event in presence) == [200, 200, 400, 409]
+        assert {e['properties'].get('presenceState') for e in presence} == {'connected', 'disconnected', None}
+    with TestClient(create_app(tmp_path), base_url='http://127.0.0.1:8895', client=('127.0.0.1', 41000)) as client:
         assert client.get('/api/v1/sessions/' + sid).json()['connection']['state'] == 'unknown'
+
+
+def test_reconnect_before_maintenance_records_expiry_once(tmp_path):
+    """A reconnect preserves the expired transition even between periodic sweeps."""
+    app = create_app(tmp_path)
+    with TestClient(app, base_url='http://127.0.0.1:8895', client=('127.0.0.1', 41000)) as client:
+        sid = register(client)
+        path = f'/api/v1/agent/sessions/{sid}/presence'
+        clock = [0]
+        app.state.store.service.sessions.presence.clock = lambda: clock[0]
+        pulse = {'connectionId': 'connection', 'state': 'connected'}
+        assert client.post(path, json=pulse).status_code == 200
+        clock[0] = 91
+        assert client.post(path, json=pulse).status_code == 200
+        assert app.state.store.service.sessions.expire_presence() == []
+        assert app.state.telemetry.technical.flush()
+        events = client.get('/api/technical-logs/v1/events').json()['events']
+        expired = [event for event in events if event['eventName'] == 'connection.presence.expired']
+        assert len(expired) == 1 and expired[0]['sessionId'] == sid

@@ -106,9 +106,12 @@ class IssueStore:
         self.cold.stop()
         self.db.close()
 
-    def _row(self, issue_id, connection=None, *, include_deleted=False):
+    def _row(self, issue_id, connection=None, *, include_deleted=False, restore=True):
         """Resolve an opaque issue ID; unknown IDs return a stable domain 404."""
+        from service_telemetry.integration import resolved_task
+
         bounded_text(issue_id, 128, empty=False)
+        requested = issue_id
         owner = connection or self.db.connection
         alias = owner.execute('SELECT issue_id FROM issue_keys WHERE key=? COLLATE NOCASE', (issue_id,)).fetchone() if '-' in issue_id else None
         if alias:
@@ -116,7 +119,8 @@ class IssueStore:
         value = owner.execute('SELECT ' + ISSUE_COLUMNS + ' FROM issues WHERE id=?', (issue_id,)).fetchone()
         if value is None or value['deleted_at'] and not include_deleted:
             raise DomainError('issue_not_found', 'Issue not found.', 404)
-        if value['storage_zip']:
+        resolved_task(requested, value['id'])
+        if restore and value['storage_zip']:
             self.cold.restore(value['id'], connection or self.db.connection)
             value = (connection or self.db.connection).execute('SELECT ' + ISSUE_COLUMNS + ' FROM issues WHERE id=?', (value['id'],)).fetchone()
         return value
@@ -190,6 +194,10 @@ class IssueStore:
         result['linkedIssues'] = {link['issueId']: result['linkedIssues'][link['issueId']] for link in result['links']}
         result['linksTruncated'] = result['linksCount'] > len(result['links'])
         if details:
+            result['reviewProgress'] = self.reviews.for_issue(row['id'])
+            if row['kind'] == 'rnd':
+                from .lifecycle import attention_child
+                result['attentionChild'] = attention_child(self.db.connection, row['id'], result['lifecycle']['phase'])
             result['conversations'] = self.service.conversations.list(20, 0, row['id'])
             from .documents import render_markdown
             result['descriptionHtml'] = render_markdown(row['description'])
@@ -271,10 +279,12 @@ class IssueStore:
     def _audit(self, connection, issue_id, action, actor, data):
         """Append an audit record in the same transaction as its domain mutation."""
         from .aging import HOUSEKEEPING, touch
+        from .execution_diagnostics import snapshot
         if action not in HOUSEKEEPING:
             touch(connection, issue_id, timestamp())
-        connection.execute('INSERT INTO history(issue_id,action,actor,payload,created_at) VALUES(?,?,?,?,?)',
-                           (issue_id, action, bounded_text(actor, 128, empty=False), json.dumps(data, ensure_ascii=False), timestamp()))
+        diagnostic = snapshot(connection, issue_id, action, actor, data)
+        connection.execute('INSERT INTO history(issue_id,action,actor,payload,created_at,execution_diagnostic) VALUES(?,?,?,?,?,?)',
+                           (issue_id, action, bounded_text(actor, 128, empty=False), json.dumps(data, ensure_ascii=False), timestamp(), diagnostic))
 
     def _validate(self, values, current, connection, actor):
         """Validate mutable fields, parent ancestry and workflow-controlled status transitions before writing."""

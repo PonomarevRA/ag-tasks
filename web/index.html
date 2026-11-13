@@ -17,8 +17,9 @@
     <link rel="stylesheet" href="./agent-sessions.css" />
     <link rel="stylesheet" href="/task-workbench.css" />
     <link rel="stylesheet" href="/vendor/ag-charts/styles.css" />
-    <link rel="stylesheet" href="/vendor/ag-design/form-tracks.css" />
-    <link rel="stylesheet" href="/vendor/ag-design/select-indicator.css" />
+    <link rel="stylesheet" href="/vendor/ag-form/form-tracks.css" />
+    <link rel="stylesheet" href="/vendor/ag-form/select-indicator.css" />
+    <link rel="stylesheet" href="/vendor/ag-help/styles.css" />
     <link rel="stylesheet" href="/work-analytics.css" />
     <link rel="stylesheet" href="/manager.css" />
   </head>
@@ -153,7 +154,7 @@
         <main id="main" tabindex="-1">
           <div class="toolbar">
             <div class="toolbar-title">
-              <h1 id="heading">Агенты и сессии</h1>
+              <h1 id="heading" tabindex="-1">Агенты и сессии</h1>
               <p id="space-breadcrumb" class="space-breadcrumb"></p>
             </div>
             <div class="toolbar-actions">
@@ -369,6 +370,7 @@
         <button
           class="ag-button ag-button--quiet ag-icon-button"
           data-close="detail"
+          autofocus
           aria-label="Закрыть"
         >
           ×

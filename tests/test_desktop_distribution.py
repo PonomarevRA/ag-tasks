@@ -105,8 +105,7 @@ def test_release_version_matches_runtime_package_and_native_manifest():
     root = Path(__file__).parents[1]
     product = json.loads((root / 'packaging/desktop-product.json').read_text())
     metadata = tomllib.loads((root / 'pyproject.toml').read_text())
-    assert __version__ == product['version'] == metadata['project']['version'] == '0.8.2'
-    assert "version='0.8.2'" in (root / 'packaging/ag_tasks.spec').read_text()
+    assert __version__ == product['version'] == metadata['project']['version']
     assert "version='" + __version__ + "'" in (root / 'packaging/ag_tasks.spec').read_text()
     from ag_tasks.config import VERSION
     assert VERSION == __version__
