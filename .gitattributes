@@ -1,0 +1,2 @@
+# Keep shipped assets byte-identical to the vendor SHA-256 manifest.
+web/vendor/** -text

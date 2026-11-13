@@ -26,7 +26,7 @@ def store(tmp_path):
 
 def test_prefixes_number_per_space_keep_aliases_and_never_reuse(store):
     old = store.create({'title': 'Existing'})
-    hp = store.spaces.write({'name': 'historic-portfolio', 'prefix': 'hp'})
+    hp = store.spaces.write({'name': 'example-portfolio', 'prefix': 'hp'})
     calc = store.spaces.write({'name': 'Calculator', 'prefix': 'CALCULATOR'})
     first = store.create({'title': 'First', 'spaceId': hp['id']})
     second = store.create({'title': 'Second', 'spaceId': hp['id']})
