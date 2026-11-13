@@ -37,6 +37,6 @@ executable = EXE(archive, analysis.scripts, [], exclude_binaries=True, name='AgT
                  target_arch=None, codesign_identity=None, entitlements_file=None)
 collection = COLLECT(executable, analysis.binaries, analysis.datas, name='AgTasks')
 if sys.platform == 'darwin':
-    bundle = BUNDLE(collection, icon=str(root / 'packaging/icons/AppIcon.icns'), name='Ag Tasks.app', bundle_identifier='local.ag-tasks.desktop', version='0.8.3',
+    bundle = BUNDLE(collection, icon=str(root / 'packaging/icons/AppIcon.icns'), name='Ag Tasks.app', bundle_identifier='local.ag-tasks.desktop', version='0.8.4',
         info_plist={'CFBundleDisplayName': 'ag-tasks', 'NSHighResolutionCapable': True,
                     'NSAppTransportSecurity': {'NSAllowsLocalNetworking': True}})

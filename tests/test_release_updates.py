@@ -2,6 +2,7 @@
 
 from io import BytesIO
 import json
+import os
 
 import pytest
 
@@ -47,7 +48,8 @@ def test_reminder_repeats_only_after_72_hours_across_restart(tmp_path):
     monitor.check(force=True)
     assert monitor.recommendation()['delivery'] == 'final_response_only'
     assert monitor.recommendation() is None
-    assert (tmp_path / 'release-reminders.json').stat().st_mode & 0o777 == 0o600
+    if os.name != 'nt':
+        assert (tmp_path / 'release-reminders.json').stat().st_mode & 0o777 == 0o600
 
     now += REMINDER_INTERVAL - 1
     monitor = owner()

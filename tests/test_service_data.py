@@ -231,8 +231,10 @@ def test_unknown_version_is_archived_without_assuming_v2_semantics(store):
     assert store.service.sessions.get(source['id'])['projection']['foregroundState'] == 'unknown'
 
 
-def test_events_and_sessions_are_cursor_paged_without_loss(store):
+def test_events_and_sessions_are_cursor_paged_without_loss(store, monkeypatch):
     """Stable cursors page facts without merging identical messages or skipping other-session cursor gaps."""
+    stamps = iter(f'2026-11-13T13:00:0{second}+00:00' for second in range(5))
+    monkeypatch.setattr('ag_tasks.service_events.timestamp', lambda: next(stamps))
     first, second = register(store), register(store)
     message = {'jsonrpc': '2.0', 'method': 'future'}
     append(store, first['id'], [event(1, message)])

@@ -3,6 +3,7 @@
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
 import json
+import os
 from pathlib import Path
 import sqlite3
 from concurrent.futures import ThreadPoolExecutor
@@ -25,7 +26,7 @@ def store(tmp_path):
 
 def test_prefixes_number_per_space_keep_aliases_and_never_reuse(store):
     old = store.create({'title': 'Existing'})
-    hp = store.spaces.write({'name': 'example-portfolio', 'prefix': 'hp'})
+    hp = store.spaces.write({'name': 'historic-portfolio', 'prefix': 'hp'})
     calc = store.spaces.write({'name': 'Calculator', 'prefix': 'CALCULATOR'})
     first = store.create({'title': 'First', 'spaceId': hp['id']})
     second = store.create({'title': 'Second', 'spaceId': hp['id']})
@@ -196,7 +197,10 @@ def test_zip_excludes_real_work_and_concurrent_restore_is_idempotent(store):
 
 def test_http_mcp_authority_and_alias_paths(tmp_path, monkeypatch):
     opened = []
-    monkeypatch.setattr('ag_tasks.documents.subprocess.Popen', lambda args, **kwargs: opened.append(args))
+    if os.name == 'nt':
+        monkeypatch.setattr(os, 'startfile', opened.append)
+    else:
+        monkeypatch.setattr('ag_tasks.documents.subprocess.Popen', lambda args, **kwargs: opened.append(args[-1]))
     with TestClient(create_app(tmp_path), base_url='http://127.0.0.1:8895') as client:
         token = {'X-Ag-Tasks-UI': client.get('/api/v1/ui-session').json()['token']}
         space = client.post('/api/v1/spaces', headers=token, json={'name': 'Portfolio', 'prefix': 'HP'}).json()
@@ -208,7 +212,7 @@ def test_http_mcp_authority_and_alias_paths(tmp_path, monkeypatch):
         assert client.post('/api/v1/issues/HP-1/open-folder', json={}).status_code == 403
         assert client.post('/api/v1/agent/issues/HP-1/open-folder', json={}).status_code in (404,405)
         assert client.post('/api/v1/issues/HP-1/open-folder', json={}, headers=token).status_code == 200
-        assert opened and opened[0][-1].startswith(str(tmp_path))
+        assert len(opened) == 1 and Path(opened[0]).is_relative_to(tmp_path)
         client.patch('/api/v1/agent/issues/HP-1', json={'status': 'stale'})
         assert client.post('/api/v1/agent/issues/HP-1/revalidate', json={'reason': 'Agent bypass'}).status_code in (404,405)
         assert client.post('/api/v1/issues/HP-1/revalidate', headers=token, json={'reason': 'User review'}).json()['status'] == 'backlog'

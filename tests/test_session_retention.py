@@ -169,7 +169,7 @@ def test_cleanup_failure_rolls_back_the_whole_observation(store):
     assert store.db.connection.execute('SELECT COUNT(*) FROM service_streams').fetchone()[0] == 1
 
 
-def test_http_sort_contract_and_startup_retention(tmp_path):
+def test_http_sort_contract_and_startup_retention(tmp_path, monkeypatch):
     """
     A real app catches up on closed time and returns activity tokens through its HTTP contract.
     """
@@ -180,6 +180,9 @@ def test_http_sort_contract_and_startup_retention(tmp_path):
     previous.close()
     with TestClient(create_app(data),base_url='http://127.0.0.1:8895') as client:
         assert client.get('/api/v1/sessions').json()['items'] == []
+        start = datetime.now(timezone.utc)
+        stamps = iter((start + timedelta(seconds=index)).isoformat() for index in range(3))
+        monkeypatch.setattr('ag_tasks.service_events.timestamp', lambda: next(stamps))
         for index in range(3):
             response = client.post('/api/v1/agent/commands',json={'clientId':'sort','commandId':str(index),
                 'operation':'session.register','payload':{'title':str(index),'agent':'test','protocol':'unknown',

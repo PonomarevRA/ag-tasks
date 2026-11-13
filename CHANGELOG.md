@@ -4,7 +4,7 @@
 
 Each release contains 1–5 short bullets in Russian and English. Explain what users can do or what works better. Keep internal tickets, implementation details, and private data in the working repository.
 
-## [0.8.3]
+## [0.8.4]
 
 ### Русский
 
